@@ -48,6 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollRightButton: document.getElementById('scroll-right-button'),
         backgroundCategories: document.getElementById('background-categories'),
         backgroundSwitcher: document.getElementById('background-switcher'),
+        musicUploadButton: document.getElementById('music-upload-button'),
+        musicUploadInput: document.getElementById('music-upload-input'),
     };
 
     // --- HELPER FUNCTIONS ---
@@ -57,20 +59,23 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.audioPlayer.play();
         elements.playPauseBtn.textContent = '⏸️';
     };
+
     const pauseSong = () => {
         isPlaying = false;
         elements.audioPlayer.pause();
         elements.playPauseBtn.textContent = '▶️';
     };
+
     const loadSong = (song) => {
         elements.songTitle.textContent = song.title;
-        elements.songArtist.textContent = "Your Artist Name"; // You can customize this
+        elements.songArtist.textContent = "Your Artist Name";
         elements.audioPlayer.src = song.src;
         elements.albumArt.src = song.cover;
         document.querySelectorAll('#playlist li').forEach(li => {
             li.classList.toggle('playing', li.dataset.songSrc === song.src);
         });
     };
+
     const prevSong = () => {
         songIndex--;
         if (songIndex < 0) {
@@ -79,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadSong(musicLibrary[songIndex]);
         playSong();
     };
+
     const nextSong = () => {
         songIndex++;
         if (songIndex > musicLibrary.length - 1) {
@@ -87,11 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
         loadSong(musicLibrary[songIndex]);
         playSong();
     };
+
     const updateProgress = (e) => {
         const { duration, currentTime } = e.srcElement;
         const progressPercent = (currentTime / duration) * 100;
         elements.progress.style.width = `${progressPercent}%`;
         const formatTime = (time) => {
+            if (isNaN(time)) return "0:00";
             const minutes = Math.floor(time / 60);
             let seconds = Math.floor(time % 60);
             if (seconds < 10) {
@@ -99,16 +107,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return `${minutes}:${seconds}`;
         };
-        if (duration) {
-            elements.durationEl.textContent = formatTime(duration);
-        }
+        elements.durationEl.textContent = formatTime(duration);
         elements.currentTimeEl.textContent = formatTime(currentTime);
     };
+
     const setProgress = (e) => {
         const width = e.currentTarget.clientWidth;
         const clickX = e.offsetX;
         const duration = elements.audioPlayer.duration;
-        elements.audioPlayer.currentTime = (clickX / width) * duration;
+        if (duration) {
+            elements.audioPlayer.currentTime = (clickX / width) * duration;
+        }
     };
 
     const openLightbox = (clickedItem, galleryType) => {
@@ -123,16 +132,19 @@ document.addEventListener('DOMContentLoaded', () => {
         showImageAtIndex(currentIndex);
         elements.lightbox.classList.remove('hidden');
     };
+
     const showImageAtIndex = (index) => {
         if (index < 0 || index >= currentGallery.length) return;
         elements.lightboxImage.src = currentGallery[index];
         elements.lightboxPrev.style.display = index === 0 ? 'none' : 'block';
         elements.lightboxNext.style.display = index === currentGallery.length - 1 ? 'none' : 'block';
     };
+
     const backgrounds = {
         sfw: [ '/assets/backgrounds/sfw/bg1.jpg', '/assets/backgrounds/sfw/bg2.jpg', '/assets/backgrounds/sfw/bg3.jpg', '/assets/backgrounds/sfw/bg4.jpg', '/assets/backgrounds/sfw/bg5.jpg' ],
         nsfw: [ '/assets/backgrounds/nsfw/bg1.jpg', '/assets/backgrounds/nsfw/bg2.jpg', '/assets/backgrounds/nsfw/bg3.jpg', '/assets/backgrounds/nsfw/bg4.jpg', '/assets/backgrounds/nsfw/bg5.jpg' ]
     };
+
     const setBackground = (bgPath) => {
         document.body.style.backgroundImage = `url(${bgPath})`;
         localStorage.setItem('selectedBackground', bgPath);
@@ -140,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
             thumb.classList.toggle('active', thumb.dataset.bgPath === bgPath);
         });
     };
+
     const generateThumbnails = (category) => {
         elements.backgroundSwitcher.innerHTML = '';
         if (!backgrounds[category]) return;
@@ -155,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setBackground(savedBackground);
         }
     };
+
     const addImageToGallery = (item) => {
         const gridItem = createGridItem(item, 'galleryImages');
         if (elements.imageGrid.children.length < 3) {
@@ -166,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
             elements.moreImagesTrigger.querySelector('span').textContent = count;
         }
     };
+
     const universalUploader = async (file, type) => {
         const formData = new FormData();
         formData.append('file', file);
@@ -179,6 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(`Upload failed: ${error.message}`);
         }
     };
+
     const createGridItem = (item, type) => {
         const container = document.createElement('div');
         container.className = 'grid-item';
@@ -207,6 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return container;
     };
+    
     const addStoryToList = (story) => {
         const storyDiv = document.createElement('div');
         storyDiv.className = 'story-item';
@@ -225,6 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         elements.storyList.prepend(storyDiv);
     };
+
     const addHomeworkToList = (file) => {
         const li = document.createElement('li');
         li.innerHTML = `<a href="${file.path}" download="${file.originalName}">${file.originalName}</a>`;
@@ -243,42 +261,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- INITIALIZATION ---
-    async function initializePage() {
-        if (isAdmin) document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
-        try {
-            const response = await fetch('/api/data');
-            const data = await response.json();
-            elements.username.childNodes[0].nodeValue = data.settings.username + ' ';
-            elements.profilePic.src = data.settings.profilePicture;
-            if(data.settings.banner) elements.banner.style.backgroundImage = `url(${data.settings.banner})`;
-            elements.youtubeLink.href = data.settings.youtubeUrl;
-            elements.imageGrid.innerHTML = '';
-            elements.moreImagesGrid.innerHTML = '';
-            elements.moreImagesContainer.classList.add('hidden');
-            data.galleryImages.forEach(addImageToGallery);
-            elements.gifGrid.innerHTML = '';
-            data.gifs.forEach(item => elements.gifGrid.appendChild(createGridItem(item, 'gifs')));
-            elements.storyList.innerHTML = '';
-            data.stories.forEach(addStoryToList);
-            elements.homeworkList.innerHTML = '';
-            data.homework.forEach(addHomeworkToList);
-            if (isAdmin) {
-                new Sortable(elements.imageGrid, {
-                    handle: '.drag-handle', animation: 150,
-                    onEnd: async (evt) => {
-                        const newOrder = Array.from(evt.target.children).map(item => ({ path: item.dataset.filePath, originalName: item.dataset.originalName }));
-                        await fetch('/api/gallery/reorder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newOrder }) });
-                    }
-                });
-            }
-        } catch (error) { console.error("Failed to initialize page data:", error); }
-        // Fetch and populate music library
+
+    async function loadMusicLibrary() {
         try {
             const res = await fetch('/api/music');
             musicLibrary = await res.json();
+            elements.playlist.innerHTML = '';
             if (musicLibrary.length > 0) {
                 loadSong(musicLibrary[songIndex]);
-                elements.playlist.innerHTML = '';
                 musicLibrary.forEach((song, index) => {
                     const li = document.createElement('li');
                     li.dataset.songSrc = song.src;
@@ -293,6 +283,43 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) { console.error("Could not load music library", error); }
     }
+
+    async function initializePage() {
+        if (isAdmin) document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+        try {
+            const response = await fetch('/api/data');
+            const data = await response.json();
+            
+            elements.username.childNodes[0].nodeValue = data.settings.username + ' ';
+            elements.profilePic.src = data.settings.profilePicture;
+            if(data.settings.banner) elements.banner.style.backgroundImage = `url(${data.settings.banner})`;
+            elements.youtubeLink.href = data.settings.youtubeUrl;
+            
+            elements.imageGrid.innerHTML = '';
+            elements.moreImagesGrid.innerHTML = '';
+            elements.moreImagesContainer.classList.add('hidden');
+            data.galleryImages.forEach(addImageToGallery);
+            
+            elements.gifGrid.innerHTML = '';
+            data.gifs.forEach(item => elements.gifGrid.appendChild(createGridItem(item, 'gifs')));
+            elements.storyList.innerHTML = '';
+            data.stories.forEach(addStoryToList);
+            elements.homeworkList.innerHTML = '';
+            data.homework.forEach(addHomeworkToList);
+            
+            if (isAdmin) {
+                new Sortable(elements.imageGrid, {
+                    handle: '.drag-handle', animation: 150,
+                    onEnd: async (evt) => {
+                        const newOrder = Array.from(evt.target.children).map(item => ({ path: item.dataset.filePath, originalName: item.dataset.originalName }));
+                        await fetch('/api/gallery/reorder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newOrder }) });
+                    }
+                });
+            }
+        } catch (error) { console.error("Failed to initialize page data:", error); }
+        await loadMusicLibrary();
+    }
+    
     const savedBackground = localStorage.getItem('selectedBackground');
     let startingCategory = 'sfw';
     if (savedBackground && backgrounds.nsfw.includes(savedBackground)) {
@@ -302,12 +329,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     generateThumbnails(startingCategory);
     setBackground(savedBackground || backgrounds.sfw[0]);
+    
     initializePage();
+
     const themeToggleButton = document.getElementById('theme-toggle');
     function setTheme(theme) { document.body.className = ''; if (theme === 'dark') document.body.classList.add('dark-theme'); localStorage.setItem('theme', theme); }
     setTheme(localStorage.getItem('theme') || 'system');
     
     // --- EVENT LISTENERS ---
+    
     elements.playPauseBtn.addEventListener('click', () => (isPlaying ? pauseSong() : playSong()));
     elements.prevBtn.addEventListener('click', prevSong);
     elements.nextBtn.addEventListener('click', nextSong);
@@ -323,24 +353,43 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.moreImagesContainer.addEventListener('mouseleave', () => elements.moreImagesWidget.classList.add('hidden'));
     elements.scrollLeftButton.addEventListener('click', () => { elements.moreImagesGrid.scrollLeft -= 110; });
     elements.scrollRightButton.addEventListener('click', () => { elements.moreImagesGrid.scrollLeft += 110; });
+    
     if (isAdmin) {
         document.getElementById('exit-admin-button').onclick = () => { window.location.search = ''; };
         document.getElementById('clean-db-button').onclick = async () => { if (!confirm('This will remove all database entries for files that are missing. Are you sure?')) return; const response = await fetch('/api/sync-database', { method: 'POST' }); const result = await response.json(); if (result.success) { alert(`Sync complete! ${result.cleanedCount} orphaned entries removed. The page will now reload.`); window.location.reload(); } else { alert('Sync failed.'); } };
         document.getElementById('admin-fab').onclick = () => document.getElementById('admin-menu').classList.toggle('hidden');
+        elements.musicUploadButton.addEventListener('click', async () => {
+            const input = elements.musicUploadInput;
+            if (!input.files[0]) return alert('Please select a music or cover file.');
+            const data = await universalUploader(input.files[0], 'music');
+            if (data) { alert(`Successfully uploaded ${data.originalName}`); await loadMusicLibrary(); }
+            input.value = '';
+        });
     }
+
     themeToggleButton.addEventListener('click', () => setTheme(document.body.classList.contains('dark-theme') ? 'light' : 'dark'));
+    
     elements.lightbox.querySelector('.close-button').onclick = () => elements.lightbox.classList.add('hidden');
+    
     document.getElementById('change-name-button').onclick = async () => { const newName = prompt('Enter new name:', elements.username.childNodes[0].nodeValue.trim()); if (!newName) return; await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: newName }) }); elements.username.childNodes[0].nodeValue = newName + ' '; };
     document.getElementById('change-url-button').onclick = async () => { const newUrl = prompt('Enter new YouTube URL:', elements.youtubeLink.href); if (!newUrl) return; await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ youtubeUrl: newUrl }) }); elements.youtubeLink.href = newUrl; };
+    
     const setupUpload = (btnId, inputId, type, addToListFunc) => { const input = document.getElementById(inputId); document.getElementById(btnId).onclick = async () => { if (!input.files[0]) return alert('Please select a file.'); const data = await universalUploader(input.files[0], type); if (data) addToListFunc(data); input.value = ''; }; };
     setupUpload('gallery-upload-button', 'gallery-upload-input', 'gallery', addImageToGallery);
     setupUpload('gif-upload-button', 'gif-upload-input', 'gif', (data) => elements.gifGrid.appendChild(createGridItem(data, 'gifs')));
     setupUpload('homework-upload-button', 'homework-upload-input', 'homework', addHomeworkToList);
+    
     elements.profilePic.onclick = () => document.getElementById('profile-picture-upload').click();
+    
     document.getElementById('profile-picture-upload').onchange = async (e) => { if (!e.target.files[0]) return; const { path } = await universalUploader(e.target.files[0], 'profile'); if (path) elements.profilePic.src = path; };
+    
     document.getElementById('change-banner-button').onclick = () => document.getElementById('banner-upload').click();
+    
     document.getElementById('banner-upload').onchange = async (e) => { if (!e.target.files[0]) return; const { path } = await universalUploader(e.target.files[0], 'banner'); if (path) elements.banner.style.backgroundImage = `url(${path})`; };
-    document.getElementById('story-form').addEventListener('submit', async (e) => { e.preventDefault(); const title = document.getElementById('story-title').value; const content = document.getElementById('story-content').value; const response = await fetch('/api/stories', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title, content }) }); addStoryToList(await response.json()); e.target.reset(); });
+    
+    document.getElementById('story-form').addEventListener('submit', async (e) => { e.preventDefault(); const title = document.getElementById('story-title').value; const content = document.getElementById('story-content').value; const response = await fetch('/api/stories', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title, content }) }); addToList(await response.json()); e.target.reset(); });
+    
     elements.chatForm.addEventListener('submit', (e) => { e.preventDefault(); if (elements.chatInput.value) { elements.socket.emit('chat message', elements.chatInput.value); elements.chatInput.value = ''; } });
+    
     elements.socket.on('chat message', (msg) => { const item = document.createElement('li'); item.textContent = msg; elements.messages.appendChild(item); elements.messages.scrollTop = elements.messages.scrollHeight; });
 });

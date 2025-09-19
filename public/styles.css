@@ -3,7 +3,7 @@
     --primary-text-light: #181818;
     --border-color-light: rgba(0, 0, 0, 0.1);
     --accent-color: #007BFF;
-    --shadow-color: rgba(0,0,0,0.1);
+    --shadow-color: rgba(0,0,0,0.08);
     --dark-shadow-color: rgba(0,0,0,0.2);
     --primary-text-dark: #e0e0e0;
     --border-color-dark: rgba(255, 255, 255, 0.1);
@@ -61,19 +61,31 @@ main {
 
 /* --- Glass Effect --- */
 section,
-aside section {
+aside section,
+.player-card,
+#playlist,
+#credits-footer,
+.customization-controls,
+#admin-menu,
+#more-images-widget,
+#audio-player {
     background-color: var(--glass-bg-light);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 30px;
     box-shadow: 0 4px 12px var(--shadow-color);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    transition: background-color 0.3s, box-shadow 0.3s;
 }
+
 body.dark-theme section,
-body.dark-theme aside section {
+body.dark-theme aside section,
+body.dark-theme .player-card,
+body.dark-theme #playlist,
+body.dark-theme #credits-footer,
+body.dark-theme .customization-controls,
+body.dark-theme #admin-menu,
+body.dark-theme #more-images-widget,
+body.dark-theme #audio-player {
     background-color: var(--glass-bg-dark);
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -83,7 +95,8 @@ body.dark-theme aside section {
 #profile-header {
     position: relative;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: -60px;
+    z-index: 10;
 }
 .header-background {
     height: 300px;
@@ -91,6 +104,7 @@ body.dark-theme aside section {
     background-size: cover;
     background-position: center;
     position: relative;
+    overflow: hidden;
     background-color: var(--glass-bg-light);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -101,21 +115,25 @@ body.dark-theme .header-background {
     background-color: var(--glass-bg-dark);
     border-color: rgba(255, 255, 255, 0.1);
 }
+.header-background::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: -25%;
+    width: 150%;
+    height: 150px;
+    background: inherit;
+    border-radius: 50%;
+}
 .profile-info {
     position: relative;
     margin-top: -90px;
+    z-index: 5;
 }
 .profile-picture {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    background: var(--glass-bg-light) padding-box;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 5px;
-    object-fit: cover;
-    transition: transform 0.2s ease;
+    width: 150px; height: 150px; border-radius: 50%; border: 2px solid transparent;
+    background: var(--glass-bg-light) padding-box; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    padding: 5px; object-fit: cover; transition: transform 0.2s ease;
 }
 .profile-picture:hover {
     transform: scale(1.05);
@@ -138,17 +156,15 @@ body.dark-theme .profile-picture {
 #more-images-container { position: relative; width: 180px; height: 150px; }
 #more-images-trigger { width: 100%; height: 100%; border-radius: 8px; background-color: var(--glass-bg-light); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; font-size: 2.5rem; color: var(--primary-text-light); transition: background-color 0.2s ease; }
 body.dark-theme #more-images-trigger { background-color: var(--glass-bg-dark); color: var(--primary-text-dark); }
-#more-images-widget { position: absolute; bottom: 0; left: 105%; z-index: 100; width: auto; height: 120px; padding: 10px; background-color: var(--glass-bg-light); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; }
-body.dark-theme #more-images-widget { background-color: var(--glass-bg-dark); border-color: rgba(255, 255, 255, 0.1); }
-#more-images-grid { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth; }
+#more-images-widget { position: absolute; bottom: 0; left: 105%; z-index: 100; width: 430px; height: auto; padding: 10px; display: flex; flex-direction: row; align-items: center; gap: 10px; }
+#more-images-grid { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth; padding: 5px; }
 #more-images-grid::-webkit-scrollbar { display: none; }
 #more-images-grid .grid-item img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; }
-.scroll-arrow { height: 100%; border: none; background-color: rgba(0,0,0,0.05); color: var(--primary-text-light); font-size: 1.5rem; padding: 0 10px; border-radius: 5px; }
+.scroll-arrow { height: 100px; border: none; background-color: rgba(0,0,0,0.05); color: var(--primary-text-light); font-size: 1.5rem; padding: 0 10px; border-radius: 5px; }
 body.dark-theme .scroll-arrow { background-color: rgba(255,255,255,0.1); color: var(--primary-text-dark); }
 
 /* --- Admin UI & Controls --- */
-.customization-controls { display: flex; align-items: center; gap: 15px; position: absolute; top: 15px; right: 15px; z-index: 25; background-color: var(--glass-bg-light); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 5px 10px; border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.2); }
-body.dark-theme .customization-controls { background-color: var(--glass-bg-dark); border-color: rgba(255, 255, 255, 0.1); }
+.customization-controls { display: flex; align-items: center; gap: 15px; position: absolute; top: 15px; right: 15px; z-index: 25; padding: 5px 10px; border-radius: 30px; }
 #change-banner-button { position: absolute; top: 15px; right: 15px; z-index: 20; font-size: 1.2rem; height: 40px; width: 40px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.2); background-color: var(--glass-bg-light); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); color: var(--primary-text-light); display: flex; align-items: center; justify-content: center; }
 body.dark-theme #change-banner-button { background-color: var(--glass-bg-dark); border-color: rgba(255, 255, 255, 0.1); color: var(--primary-text-dark); }
 .hidden { display: none !important; }
@@ -157,8 +173,7 @@ body.dark-theme #change-banner-button { background-color: var(--glass-bg-dark); 
 #admin-tools { position: fixed; bottom: 20px; left: 20px; z-index: 2000; }
 #admin-fab { width: 50px; height: 50px; border-radius: 50%; background-color: var(--accent-color); color: white; border: none; font-size: 24px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s ease; }
 #admin-fab:hover { transform: scale(1.1); }
-#admin-menu { position: absolute; bottom: 65px; left: 0; width: 250px; background-color: var(--glass-bg-light); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); padding: 10px; display: flex; flex-direction: column; gap: 10px; border: 1px solid rgba(255, 255, 255, 0.2); }
-body.dark-theme #admin-menu { background-color: var(--glass-bg-dark); border-color: rgba(255, 255, 255, 0.1); }
+#admin-menu { position: absolute; bottom: 65px; left: 0; width: 250px; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
 #admin-menu .menu-header { font-weight: bold; text-align: center; padding-bottom: 10px; border-bottom: 1px solid var(--border-color-light); margin-bottom: 5px; }
 body.dark-theme #admin-menu .menu-header { border-color: var(--border-color-dark); }
 #admin-menu button { width: 100%; background-color: rgba(0,0,0,0.05); color: var(--primary-text-light); text-align: left; padding: 10px 15px; }
@@ -172,14 +187,13 @@ body.dark-theme #admin-menu button { background-color: rgba(255,255,255,0.1); co
 .story-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border-color-light); }
 .story-item > div { flex-grow: 1; }
 .story-item .delete-button { position: static; display: inline-block; margin-left: 10px; flex-shrink: 0; }
+#story-list { max-height: 500px; overflow-y: auto; }
 #story-list h4, #story-list p { margin: 0; } #story-list p { font-size: 0.9rem; opacity: 0.7; }
 #chat-container { border: 1px solid var(--border-color-light); border-radius: 8px; padding: 10px; }
 body.dark-theme #chat-container { border-color: var(--border-color-dark); }
 #messages { height: 200px; overflow-y: auto; list-style: none; padding: 0; }
 #chat-form { display: flex; gap: 10px; margin-top: 10px; }
-
-#credits-footer { max-width: 1400px; margin: 0 auto 20px auto; padding: 20px; text-align: center; font-size: 0.9rem; background-color: var(--glass-bg-light); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 12px; box-shadow: 0 4px 12px var(--shadow-color); border: 1px solid rgba(255, 255, 255, 0.2); }
-body.dark-theme #credits-footer { background-color: var(--glass-bg-dark); border-color: rgba(255, 255, 255, 0.1); }
+#credits-footer { max-width: 1400px; margin: 0 auto 20px auto; padding: 20px; text-align: center; font-size: 0.9rem; }
 #credits-footer h3 { margin: 0 0 10px 0; }
 #credits-footer ul { list-style: none; padding: 0; margin: 0; }
 #credits-footer a { color: var(--accent-color); }
@@ -194,143 +208,30 @@ body.dark-theme #credits-footer { background-color: var(--glass-bg-dark); border
 .lightbox-arrow.next { right: 20px; }
 
 /* --- Music Player --- */
-#music-player {
-    position: relative;
-    width: 100%;
-    margin-top: 30px;
-    z-index: 5;
-}
-.player-card {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 15px;
-    background-color: var(--glass-bg-light);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 12px;
-    box-shadow: 0 4px 15px var(--dark-shadow-color);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    text-align: center;
-}
-body.dark-theme .player-card {
-    background-color: var(--glass-bg-dark);
-    border-color: rgba(255, 255, 255, 0.1);
-}
-#album-art {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
-.song-info h4, .song-info p {
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.song-info p {
-    font-size: 0.9rem;
-    opacity: 0.7;
-    margin-top: 5px;
-}
-.progress-container {
-    width: 100%;
-    background-color: rgba(0,0,0,0.1);
-    border-radius: 5px;
-    margin: 10px 0;
-    cursor: pointer;
-    height: 6px;
-}
-.progress {
-    background-color: var(--accent-color);
-    width: 0%;
-    height: 100%;
-    border-radius: 5px;
-    transition: width 0.1s linear;
-}
-.time-stamps {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.8rem;
-    opacity: 0.8;
-    margin: 5px 0 10px 0;
-}
-.controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-}
-.controls button {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: var(--primary-text-light);
-}
-body.dark-theme .controls button {
-    color: var(--primary-text-dark);
-}
-#play-pause-button {
-    font-size: 2.5rem;
-}
-.playlist-container {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-}
-#playlist-toggle {
-    padding: 8px 15px;
-    border-radius: 20px;
-    width: 100%;
-    box-sizing: border-box;
-}
-#playlist {
-    list-style: none;
-    padding: 10px;
-    margin: 5px 0 0 0;
-    max-height: 200px;
-    overflow-y: auto;
-    background-color: var(--glass-bg-light);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    width: 100%;
-    box-sizing: border-box;
-    text-align: left;
-}
-body.dark-theme #playlist {
-    background-color: var(--glass-bg-dark);
-    border-color: rgba(255, 255, 255, 0.1);
-}
-#playlist li {
-    display: flex;
-    align-items: center;
-    padding: 8px;
-    border-radius: 5px;
-    transition: background-color 0.2s;
-}
-#playlist li.playing {
-    background-color: var(--accent-color);
-    color: white;
-}
-#playlist li img {
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-    border-radius: 4px;
-    margin-right: 10px;
-}
+#music-player { width: 100%; margin-top: 30px; }
+.player-card { width: 100%; box-sizing: border-box; padding: 15px; text-align: center; }
+#album-art { width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; margin-bottom: 15px; }
+.song-info h4, .song-info p { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.song-info p { font-size: 0.9rem; opacity: 0.7; margin-top: 5px; }
+.progress-container { width: 100%; background-color: rgba(0,0,0,0.1); border-radius: 5px; margin: 10px 0; cursor: pointer; height: 6px; }
+.progress { background-color: var(--accent-color); width: 0%; height: 100%; border-radius: 5px; transition: width 0.1s linear; }
+.time-stamps { display: flex; justify-content: space-between; font-size: 0.8rem; opacity: 0.8; margin: 5px 0 10px 0; }
+.controls { display: flex; justify-content: center; align-items: center; gap: 20px; }
+.controls button { background: none; border: none; font-size: 1.5rem; color: var(--primary-text-light); }
+body.dark-theme .controls button { color: var(--primary-text-dark); }
+#play-pause-button { font-size: 2.5rem; }
+.playlist-container { margin-top: 10px; display: flex; flex-direction: column; }
+#playlist-toggle { padding: 8px 15px; border-radius: 20px; width: 100%; box-sizing: border-box; }
+#playlist { list-style: none; padding: 10px; margin: 5px 0 0 0; max-height: 200px; overflow-y: auto; width: 100%; box-sizing: border-box; text-align: left; }
+#playlist li { display: flex; align-items: center; padding: 8px; border-radius: 5px; transition: background-color 0.2s; }
+#playlist li.playing { background-color: var(--accent-color); color: white; }
+#playlist li img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px; }
 
 /* --- Forms & Background Switcher --- */
 input[type="text"], textarea, #chat-input { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid var(--border-color-light); border-radius: 5px; font-family: 'Times New Roman', Times, serif; font-size: 1rem; background-color: rgba(255, 255, 255, 0.5); color: inherit; }
 body.dark-theme input[type="text"], body.dark-theme textarea, body.dark-theme #chat-input { border-color: var(--border-color-dark); background-color: rgba(0,0,0,0.5); }
 textarea { min-height: 200px; resize: vertical; }
 button { background: var(--accent-color); color: white; border: none; padding: 10px 15px; border-radius: 5px; }
-.customization-controls { display: flex; align-items: center; gap: 15px; position: absolute; top: 15px; right: 15px; z-index: 25; background-color: var(--glass-bg-light); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 5px 10px; border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.2); }
-body.dark-theme .customization-controls { background-color: var(--glass-bg-dark); border-color: rgba(255, 255, 255, 0.1); }
 #background-controls { display: flex; align-items: center; gap: 10px; }
 #background-categories { display: flex; background-color: rgba(0,0,0,0.05); border-radius: 20px; padding: 2px; }
 body.dark-theme #background-categories { background-color: rgba(255,255,255,0.1); }

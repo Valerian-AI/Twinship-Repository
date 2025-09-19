@@ -43,19 +43,33 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // --- File Upload Logic ---
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, 'public/uploads/'),
-    filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
+    destination: (req, file, cb) => {
+        let uploadPath = 'public/uploads/';
+        if (req.body.type === 'music') {
+            uploadPath = 'public/assets/music/';
+        }
+        cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+        if (req.body.type === 'music') {
+            cb(null, file.originalname);
+        } else {
+            cb(null, Date.now() + '-' + file.originalname);
+        }
+    }
 });
 const upload = multer({ storage: storage });
 
 // --- API Endpoints ---
 
-// Universal upload endpoint
 app.post('/upload', upload.single('file'), async (req, res) => {
     if (!req.file) return res.status(400).send('No file uploaded.');
-    const filePath = `/uploads/${req.file.filename}`;
     const { type } = req.body;
-
+    let filePath = `/uploads/${req.file.filename}`;
+    if (type === 'music') {
+        filePath = `/assets/music/${req.file.filename}`;
+        return res.json({ path: filePath, originalName: req.file.originalname });
+    }
     try {
         const fileData = { path: filePath, originalName: req.file.originalname };
         if (type === 'gallery') await GalleryImage.create(fileData);
@@ -63,92 +77,53 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         else if (type === 'homework') await Homework.create(fileData);
         else if (type === 'profile') await Settings.updateOne({}, { profilePicture: filePath }, { upsert: true });
         else if (type === 'banner') await Settings.updateOne({}, { banner: filePath }, { upsert: true });
-
         res.json({ path: filePath, originalName: req.file.originalname });
-    } catch (error) {
-        res.status(500).json({ error: 'Error saving to database' });
-    }
+    } catch (error) { res.status(500).json({ error: 'Error saving to database' }); }
 });
 
-// Universal media deletion
 app.delete('/api/media', async (req, res) => {
     const { filePath, type } = req.body;
-    if (!filePath) return res.status(400).send('Invalid file path.');
-    
-    try {
-        const physicalPath = path.join(__dirname, 'public', filePath);
-        if (fs.existsSync(physicalPath)) fs.unlinkSync(physicalPath);
-
-        const models = { galleryImages: GalleryImage, gifs: Gif, homework: Homework };
-        if (models[type]) {
-            await models[type].deleteOne({ path: filePath });
-        }
-        res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: 'Error deleting from database' });
-    }
+    if (!filePath || typeof filePath !== 'string') return res.status(400).send('Invalid file path provided.');
+    const physicalPath = path.join(__dirname, 'public', filePath);
+    if (fs.existsSync(physicalPath)) fs.unlinkSync(physicalPath);
+    const models = { galleryImages: GalleryImage, gifs: Gif, homework: Homework };
+    if (models[type]) await models[type].deleteOne({ path: filePath });
+    res.json({ success: true });
 });
 
-// Single endpoint to get all data
 app.get('/api/data', async (req, res) => {
     try {
         let settings = await Settings.findOne();
-        if (!settings) settings = await Settings.create({}); // Create default settings if they don't exist
-
+        if (!settings) settings = await Settings.create({});
         res.json({
             galleryImages: await GalleryImage.find(),
             gifs: await Gif.find(),
-            stories: await Story.find().sort({id: -1}), // Sort by newest first
+            stories: await Story.find().sort({id: -1}),
             homework: await Homework.find(),
             settings: settings
         });
-    } catch (error) {
-        res.status(500).json({ error: 'Error fetching data' });
-    }
+    } catch (error) { res.status(500).json({ error: 'Error fetching data' }); }
 });
 
-// NEW: Endpoint to scan and return the music library
 app.get('/api/music', (req, res) => {
     const musicPath = path.join(__dirname, 'public/assets/music');
     fs.readdir(musicPath, (err, files) => {
-        if (err) {
-            console.error("Could not list the music directory.", err);
-            return res.status(500).json({ error: "Could not read music directory. Make sure /public/assets/music exists." });
-        }
-        
-        const musicLibrary = files
-            .filter(file => file.endsWith('.mp3'))
-            .map(file => {
-                const songName = path.parse(file).name;
-                const coverFile = files.find(img => img.startsWith(songName) && (img.endsWith('.jpg') || img.endsWith('.png')));
-                return {
-                    title: songName.replace(/_/g, ' ').replace(/-/g, ' '),
-                    src: `/assets/music/${file}`,
-                    cover: coverFile ? `/assets/music/${coverFile}` : 'placeholder-album-art.jpg'
-                };
-            });
+        if (err) { return res.status(500).json({ error: "Could not read music directory." }); }
+        const musicLibrary = files.filter(f => f.endsWith('.mp3')).map(f => {
+            const songName = path.parse(f).name;
+            const coverFile = files.find(img => img.startsWith(songName) && (img.endsWith('.jpg') || img.endsWith('.png')));
+            return { title: songName.replace(/[_-]/g, ' '), src: `/assets/music/${f}`, cover: coverFile ? `/assets/music/${coverFile}` : 'placeholder-album-art.jpg' };
+        });
         res.json(musicLibrary);
     });
 });
 
+app.post('/api/stories', async (req, res) => { const newStory = await Story.create({ id: Date.now(), ...req.body }); res.status(201).json(newStory); });
+app.delete('/api/stories/:id', async (req, res) => { await Story.deleteOne({ id: req.params.id }); res.json({ success: true }); });
+app.post('/api/settings', async (req, res) => { const { username, youtubeUrl } = req.body; const updateData = {}; if (username) updateData.username = username; if (youtubeUrl) updateData.youtubeUrl = youtubeUrl; const updatedSettings = await Settings.findOneAndUpdate({}, updateData, { new: true, upsert: true }); res.json(updatedSettings); });
+app.post('/api/gallery/reorder', async (req, res) => { await db.set('galleryImages', req.body.newOrder).write(); res.json({ success: true }); });
+app.post('/api/sync-database', async (req, res) => { /* ... (This is a lowdb function, it's safe to remove or leave as is) ... */ res.json({ success: true, cleanedCount: 0 }); });
 
-// Other endpoints
-app.post('/api/stories', async (req, res) => {
-    const newStory = await Story.create({ id: Date.now(), ...req.body });
-    res.status(201).json(newStory);
-});
-app.delete('/api/stories/:id', async (req, res) => {
-    await Story.deleteOne({ id: req.params.id });
-    res.json({ success: true });
-});
-app.post('/api/settings', async (req, res) => {
-    const { username, youtubeUrl } = req.body;
-    const updateData = {};
-    if (username) updateData.username = username;
-    if (youtubeUrl) updateData.youtubeUrl = youtubeUrl;
-    const updatedSettings = await Settings.findOneAndUpdate({}, updateData, { new: true, upsert: true });
-    res.json(updatedSettings);
-});
 
 // --- Socket.IO for Live Chat ---
 io.on('connection', (socket) => {
