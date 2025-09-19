@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twinship Repository</title>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twinship Repository</title>
+    
+    <link rel="icon" type="image/png" href="/assets/favicon-evil.png">
+
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+</head>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+</head>
+<body>
+
+    <div id="admin-tools" class="admin-only hidden">
+        <button id="admin-fab" title="Admin Tools">🛠️</button>
+        <div id="admin-menu" class="hidden">
+            <div class="menu-header">Admin Tools</div>
+            <button id="clean-db-button">Clean Orphaned Entries</button>
+            <button id="exit-admin-button">View as User</button>
+        </div>
+    </div>
+
+    <div id="lightbox" class="hidden">
+        <button class="lightbox-arrow prev" id="lightbox-prev" title="Previous image">◄</button>
+        <img src="" alt="Enlarged view" class="lightbox-content">
+        <button class="lightbox-arrow next" id="lightbox-next" title="Next image">►</button>
+        <span class="close-button" title="Close">&times;</span>
+    </div>
+
+    <header id="profile-header">
+        <div class="header-background" id="banner-display">
+            <button id="change-banner-button" class="admin-only hidden" title="Change Banner">✏️</button>
+            <input type="file" id="banner-upload" accept="image/*" hidden>
+        </div>
+        <div class="profile-info">
+            <img src="placeholder-profile.jpg" alt="Profile Picture" class="profile-picture" id="profile-picture-display" title="Click to change profile picture">
+            <input type="file" id="profile-picture-upload" accept="image/*" hidden>
+            <h1 id="username-display">Your Name <span id="change-name-button" class="admin-only hidden" title="Change Name">✏️</span></h1>
+        </div>
+        <div class="customization-controls">
+             <button id="theme-toggle" title="Toggle Theme">Toggle Theme</button>
+             <div id="background-controls">
+                <div id="background-categories">
+                    <button data-category="sfw" class="active">SFW</button>
+                    <button data-category="nsfw">NSFW</button>
+                </div>
+                <div id="background-switcher"></div>
+             </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="main-layout">
+            <div class="content-column">
+                <section id="gallery-section">
+                    <h2>Image Repository</h2>
+                    <div class="upload-form">
+                        <input type="file" id="gallery-upload-input" accept=".png,.jpg,.jpeg,.webp">
+                        <button id="gallery-upload-button">Upload Image</button>
+                    </div>
+                    <div class="grid-container" id="image-grid"></div>
+                     <div id="more-images-container" class="hidden">
+                        <div id="more-images-trigger">
+                            +<span>0</span>
+                        </div>
+                        <div id="more-images-widget" class="hidden">
+                            <button class="scroll-arrow left" id="scroll-left-button">◄</button>
+                            <div id="more-images-grid"></div>
+                            <button class="scroll-arrow right" id="scroll-right-button">►</button>
+                        </div>
+                    </div>
+                </section>
+                
+                <section id="gif-section">
+                    <h2>GIF Repository</h2>
+                    <div class="upload-form">
+                        <input type="file" id="gif-upload-input" accept=".gif">
+                        <button id="gif-upload-button">Upload GIF</button>
+                    </div>
+                    <div class="grid-container" id="gif-grid"></div>
+                </section>
+
+                <section id="writings-section">
+                    <h2>Create a New Story</h2>
+                    <form id="story-form">
+                        <input type="text" id="story-title" placeholder="Enter your title here..." required>
+                        <textarea id="story-content" placeholder="Write your story..." required></textarea>
+                        <button type="submit">Save Story</button>
+                    </form>
+                </section>
+                
+                <section id="chatroom-section">
+                    <h2>Live Chat</h2>
+                    <div id="chat-container">
+                        <ul id="messages"></ul>
+                        <form id="chat-form" action="">
+                            <input id="chat-input" autocomplete="off" placeholder="Say something..."/><button type="submit">Send</button>
+                        </form>
+                    </div>
+                </section>
+                
+                <section id="homework-section">
+                    <h2>Homework Repository</h2>
+                    <div class="upload-form">
+                        <input type="file" id="homework-upload-input">
+                        <button id="homework-upload-button">Upload File</button>
+                    </div>
+                    <ul id="homework-list" class="file-list"></ul>
+                </section>
+            </div>
+
+            <aside class="sidebar-column">
+                <section id="youtube-section">
+                    <h3>My Channel <span id="change-url-button" class="admin-only hidden" title="Change URL">✏️</span></h3>
+                    <a href="#" id="youtube-link" target="_blank" rel="noopener noreferrer">Visit my YouTube</a>
+                </section>
+
+                <section id="story-repository">
+                    <h3>Repository of Stories</h3>
+                    <div id="story-list"></div>
+                </section>
+
+                <div id="music-player">
+                    <audio id="audio-source"></audio>
+                    <div class="player-card">
+                        <img src="placeholder-album-art.jpg" alt="Album Art" id="album-art">
+                        <div class="song-info">
+                            <h4 id="song-title">Select a Song</h4>
+                            <p id="song-artist">from the Playlist</p>
+                        </div>
+                        <div class="progress-container" id="progress-container" title="Seek">
+                            <div class="progress" id="progress"></div>
+                        </div>
+                        <div class="time-stamps">
+                            <span id="current-time">0:00</span>
+                            <span id="duration">0:00</span>
+                        </div>
+                        <div class="controls">
+                            <button id="prev-button" title="Previous">⏮</button>
+                            <button id="play-pause-button" title="Play/Pause">▶️</button>
+                            <button id="next-button" title="Next">⏭</button>
+                        </div>
+                    </div>
+                    <div class="playlist-container">
+                        <button id="playlist-toggle">☰ Playlist</button>
+                        <ul id="playlist" class="hidden">
+                            </ul>
+                    </div>
+                </div>
+
+            </aside>
+        </div>
+    </main>
+
+    <footer id="credits-footer">
+        <h3>Asset Credits</h3>
+        <ul>
+            <li>Cursors: "Artist Name" - <a href="#" target="_blank" rel="noopener noreferrer">Source Link</a></li>
+        </ul>
+    </footer>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

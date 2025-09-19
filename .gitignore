@@ -1,0 +1,8 @@
+# Dependency directories
+node_modules/
+
+# Database file - keep this private
+db.json
+
+# Environment variables
+.env
