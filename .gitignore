@@ -1,7 +1,7 @@
 # Dependency directories
 node_modules/
 
-# Database file - keep this private
+# Database file - no longer needed but good to keep
 db.json
 
 # Environment variables

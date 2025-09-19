@@ -52,29 +52,72 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- HELPER FUNCTIONS ---
 
-    const playSong = () => { isPlaying = true; elements.audioPlayer.play(); elements.playPauseBtn.textContent = '⏸️'; };
-    const pauseSong = () => { isPlaying = false; elements.audioPlayer.pause(); elements.playPauseBtn.textContent = '▶️'; };
+    const playSong = () => {
+        isPlaying = true;
+        elements.audioPlayer.play();
+        elements.playPauseBtn.textContent = '⏸️';
+    };
+    const pauseSong = () => {
+        isPlaying = false;
+        elements.audioPlayer.pause();
+        elements.playPauseBtn.textContent = '▶️';
+    };
     const loadSong = (song) => {
         elements.songTitle.textContent = song.title;
+        elements.songArtist.textContent = "Your Artist Name"; // You can customize this
         elements.audioPlayer.src = song.src;
         elements.albumArt.src = song.cover;
-        document.querySelectorAll('#playlist li').forEach(li => { li.classList.toggle('playing', li.dataset.songSrc === song.src); });
+        document.querySelectorAll('#playlist li').forEach(li => {
+            li.classList.toggle('playing', li.dataset.songSrc === song.src);
+        });
     };
-    const prevSong = () => { songIndex--; if (songIndex < 0) { songIndex = musicLibrary.length - 1; } loadSong(musicLibrary[songIndex]); playSong(); };
-    const nextSong = () => { songIndex++; if (songIndex > musicLibrary.length - 1) { songIndex = 0; } loadSong(musicLibrary[songIndex]); playSong(); };
+    const prevSong = () => {
+        songIndex--;
+        if (songIndex < 0) {
+            songIndex = musicLibrary.length - 1;
+        }
+        loadSong(musicLibrary[songIndex]);
+        playSong();
+    };
+    const nextSong = () => {
+        songIndex++;
+        if (songIndex > musicLibrary.length - 1) {
+            songIndex = 0;
+        }
+        loadSong(musicLibrary[songIndex]);
+        playSong();
+    };
     const updateProgress = (e) => {
         const { duration, currentTime } = e.srcElement;
         const progressPercent = (currentTime / duration) * 100;
         elements.progress.style.width = `${progressPercent}%`;
-        const formatTime = (time) => { const minutes = Math.floor(time / 60); let seconds = Math.floor(time % 60); if (seconds < 10) { seconds = `0${seconds}`; } return `${minutes}:${seconds}`; };
-        if (duration) elements.durationEl.textContent = formatTime(duration);
+        const formatTime = (time) => {
+            const minutes = Math.floor(time / 60);
+            let seconds = Math.floor(time % 60);
+            if (seconds < 10) {
+                seconds = `0${seconds}`;
+            }
+            return `${minutes}:${seconds}`;
+        };
+        if (duration) {
+            elements.durationEl.textContent = formatTime(duration);
+        }
         elements.currentTimeEl.textContent = formatTime(currentTime);
     };
-    const setProgress = (e) => { const width = e.currentTarget.clientWidth; const clickX = e.offsetX; const duration = elements.audioPlayer.duration; elements.audioPlayer.currentTime = (clickX / width) * duration; };
+    const setProgress = (e) => {
+        const width = e.currentTarget.clientWidth;
+        const clickX = e.offsetX;
+        const duration = elements.audioPlayer.duration;
+        elements.audioPlayer.currentTime = (clickX / width) * duration;
+    };
 
     const openLightbox = (clickedItem, galleryType) => {
         let gallerySource;
-        if (galleryType === 'galleryImages') { gallerySource = Array.from(document.querySelectorAll('#image-grid .grid-item, #more-images-grid .grid-item')); } else { gallerySource = Array.from(document.querySelectorAll('#gif-grid .grid-item')); }
+        if (galleryType === 'galleryImages') {
+            gallerySource = Array.from(document.querySelectorAll('#image-grid .grid-item, #more-images-grid .grid-item'));
+        } else {
+            gallerySource = Array.from(document.querySelectorAll('#gif-grid .grid-item'));
+        }
         currentGallery = gallerySource.map(item => item.dataset.filePath);
         currentIndex = currentGallery.indexOf(clickedItem.path);
         showImageAtIndex(currentIndex);
@@ -93,24 +136,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const setBackground = (bgPath) => {
         document.body.style.backgroundImage = `url(${bgPath})`;
         localStorage.setItem('selectedBackground', bgPath);
-        document.querySelectorAll('.bg-thumbnail').forEach(thumb => { thumb.classList.toggle('active', thumb.dataset.bgPath === bgPath); });
+        document.querySelectorAll('.bg-thumbnail').forEach(thumb => {
+            thumb.classList.toggle('active', thumb.dataset.bgPath === bgPath);
+        });
     };
     const generateThumbnails = (category) => {
         elements.backgroundSwitcher.innerHTML = '';
         if (!backgrounds[category]) return;
-        backgrounds[category].forEach(bgPath => { const thumb = document.createElement('div'); thumb.className = 'bg-thumbnail'; thumb.style.backgroundImage = `url(${bgPath})`; thumb.dataset.bgPath = bgPath; elements.backgroundSwitcher.appendChild(thumb); });
+        backgrounds[category].forEach(bgPath => {
+            const thumb = document.createElement('div');
+            thumb.className = 'bg-thumbnail';
+            thumb.style.backgroundImage = `url(${bgPath})`;
+            thumb.dataset.bgPath = bgPath;
+            elements.backgroundSwitcher.appendChild(thumb);
+        });
         const savedBackground = localStorage.getItem('selectedBackground');
-        if (savedBackground && backgrounds[category].includes(savedBackground)) { setBackground(savedBackground); }
+        if (savedBackground && backgrounds[category].includes(savedBackground)) {
+            setBackground(savedBackground);
+        }
     };
     const addImageToGallery = (item) => {
         const gridItem = createGridItem(item, 'galleryImages');
-        if (elements.imageGrid.children.length < 3) { elements.imageGrid.appendChild(gridItem); } else { elements.moreImagesContainer.classList.remove('hidden'); elements.moreImagesGrid.appendChild(gridItem); const count = elements.moreImagesGrid.children.length; elements.moreImagesTrigger.querySelector('span').textContent = count; }
+        if (elements.imageGrid.children.length < 3) {
+            elements.imageGrid.appendChild(gridItem);
+        } else {
+            elements.moreImagesContainer.classList.remove('hidden');
+            elements.moreImagesGrid.appendChild(gridItem);
+            const count = elements.moreImagesGrid.children.length;
+            elements.moreImagesTrigger.querySelector('span').textContent = count;
+        }
     };
     const universalUploader = async (file, type) => {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('type', type);
-        try { const response = await fetch('/upload', { method: 'POST', body: formData }); if (!response.ok) throw new Error(await response.text()); return await response.json(); } catch (error) { console.error(`Upload failed for ${type}:`, error); alert(`Upload failed: ${error.message}`); }
+        try {
+            const response = await fetch('/upload', { method: 'POST', body: formData });
+            if (!response.ok) throw new Error(await response.text());
+            return await response.json();
+        } catch (error) {
+            console.error(`Upload failed for ${type}:`, error);
+            alert(`Upload failed: ${error.message}`);
+        }
     };
     const createGridItem = (item, type) => {
         const container = document.createElement('div');
@@ -125,9 +192,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-button';
             deleteBtn.innerHTML = '&times;';
-            deleteBtn.onclick = async () => { if (!confirm('Are you sure?')) return; await fetch('/api/media', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filePath: item.path, type }) }); initializePage(); };
+            deleteBtn.onclick = async () => {
+                if (!confirm('Are you sure?')) return;
+                await fetch('/api/media', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filePath: item.path, type }) });
+                initializePage();
+            };
             container.appendChild(deleteBtn);
-            if (type === 'galleryImages') { const dragHandle = document.createElement('span'); dragHandle.className = 'drag-handle'; dragHandle.textContent = '☰'; container.appendChild(dragHandle); }
+            if (type === 'galleryImages') {
+                const dragHandle = document.createElement('span');
+                dragHandle.className = 'drag-handle';
+                dragHandle.textContent = '☰';
+                container.appendChild(dragHandle);
+            }
         }
         return container;
     };
@@ -136,13 +212,33 @@ document.addEventListener('DOMContentLoaded', () => {
         storyDiv.className = 'story-item';
         storyDiv.innerHTML = `<div><h4>${story.title}</h4><p>${story.content.substring(0, 50)}...</p></div>`;
         storyDiv.querySelector('div').onclick = () => alert(`Title: ${story.title}\n\n${story.content}`);
-        if (isAdmin) { const deleteBtn = document.createElement('button'); deleteBtn.className = 'delete-button'; deleteBtn.onclick = async (e) => { e.stopPropagation(); if (!confirm('Delete this story?')) return; await fetch(`/api/stories/${story.id}`, { method: 'DELETE' }); storyDiv.remove(); }; storyDiv.appendChild(deleteBtn); }
+        if (isAdmin) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-button';
+            deleteBtn.onclick = async (e) => {
+                e.stopPropagation();
+                if (!confirm('Delete this story?')) return;
+                await fetch(`/api/stories/${story.id}`, { method: 'DELETE' });
+                storyDiv.remove();
+            };
+            storyDiv.appendChild(deleteBtn);
+        }
         elements.storyList.prepend(storyDiv);
     };
     const addHomeworkToList = (file) => {
         const li = document.createElement('li');
         li.innerHTML = `<a href="${file.path}" download="${file.originalName}">${file.originalName}</a>`;
-        if (isAdmin) { const deleteBtn = document.createElement('button'); deleteBtn.className = 'delete-button'; deleteBtn.innerHTML = '&times;'; deleteBtn.onclick = async () => { if (!confirm('Delete this file?')) return; await fetch('/api/media', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filePath: file.path, type: 'homework' }) }); li.remove(); }; li.appendChild(deleteBtn); }
+        if (isAdmin) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-button';
+            deleteBtn.innerHTML = '&times;';
+            deleteBtn.onclick = async () => {
+                if (!confirm('Delete this file?')) return;
+                await fetch('/api/media', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filePath: file.path, type: 'homework' }) });
+                li.remove();
+            };
+            li.appendChild(deleteBtn);
+        }
         elements.homeworkList.appendChild(li);
     };
 
@@ -182,11 +278,16 @@ document.addEventListener('DOMContentLoaded', () => {
             musicLibrary = await res.json();
             if (musicLibrary.length > 0) {
                 loadSong(musicLibrary[songIndex]);
+                elements.playlist.innerHTML = '';
                 musicLibrary.forEach((song, index) => {
                     const li = document.createElement('li');
                     li.dataset.songSrc = song.src;
                     li.innerHTML = `<img src="${song.cover}" alt="cover"> <span>${song.title}</span>`;
-                    li.addEventListener('click', () => { songIndex = index; loadSong(musicLibrary[songIndex]); playSong(); });
+                    li.addEventListener('click', () => {
+                        songIndex = index;
+                        loadSong(musicLibrary[songIndex]);
+                        playSong();
+                    });
                     elements.playlist.appendChild(li);
                 });
             }
@@ -194,7 +295,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const savedBackground = localStorage.getItem('selectedBackground');
     let startingCategory = 'sfw';
-    if (savedBackground && backgrounds.nsfw.includes(savedBackground)) { startingCategory = 'nsfw'; document.querySelector('#background-categories button[data-category="nsfw"]').classList.add('active'); document.querySelector('#background-categories button[data-category="sfw"]').classList.remove('active'); }
+    if (savedBackground && backgrounds.nsfw.includes(savedBackground)) {
+        startingCategory = 'nsfw';
+        document.querySelector('#background-categories button[data-category="nsfw"]').classList.add('active');
+        document.querySelector('#background-categories button[data-category="sfw"]').classList.remove('active');
+    }
     generateThumbnails(startingCategory);
     setBackground(savedBackground || backgrounds.sfw[0]);
     initializePage();

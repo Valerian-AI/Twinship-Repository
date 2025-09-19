@@ -4,16 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Twinship Repository</title>
-    <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Twinship Repository</title>
-    
     <link rel="icon" type="image/png" href="/assets/favicon-evil.png">
-
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-</head>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 </head>
@@ -33,6 +24,34 @@
         <img src="" alt="Enlarged view" class="lightbox-content">
         <button class="lightbox-arrow next" id="lightbox-next" title="Next image">►</button>
         <span class="close-button" title="Close">&times;</span>
+    </div>
+
+    <div id="music-player">
+        <audio id="audio-source"></audio>
+        <div class="player-card">
+            <img src="placeholder-album-art.jpg" alt="Album Art" id="album-art">
+            <div class="song-info">
+                <h4 id="song-title">Select a Song</h4>
+                <p id="song-artist">from the Playlist</p>
+            </div>
+            <div class="progress-container" id="progress-container" title="Seek">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="time-stamps">
+                <span id="current-time">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+            <div class="controls">
+                <button id="prev-button" title="Previous">⏮</button>
+                <button id="play-pause-button" title="Play/Pause">▶️</button>
+                <button id="next-button" title="Next">⏭</button>
+            </div>
+        </div>
+        <div class="playlist-container">
+            <button id="playlist-toggle">☰ Playlist</button>
+            <ul id="playlist" class="hidden">
+                </ul>
+        </div>
     </div>
 
     <header id="profile-header">
@@ -128,33 +147,8 @@
                     <div id="story-list"></div>
                 </section>
 
-                <div id="music-player">
-                    <audio id="audio-source"></audio>
-                    <div class="player-card">
-                        <img src="placeholder-album-art.jpg" alt="Album Art" id="album-art">
-                        <div class="song-info">
-                            <h4 id="song-title">Select a Song</h4>
-                            <p id="song-artist">from the Playlist</p>
-                        </div>
-                        <div class="progress-container" id="progress-container" title="Seek">
-                            <div class="progress" id="progress"></div>
-                        </div>
-                        <div class="time-stamps">
-                            <span id="current-time">0:00</span>
-                            <span id="duration">0:00</span>
-                        </div>
-                        <div class="controls">
-                            <button id="prev-button" title="Previous">⏮</button>
-                            <button id="play-pause-button" title="Play/Pause">▶️</button>
-                            <button id="next-button" title="Next">⏭</button>
-                        </div>
+                 <div id="music-player-container">
                     </div>
-                    <div class="playlist-container">
-                        <button id="playlist-toggle">☰ Playlist</button>
-                        <ul id="playlist" class="hidden">
-                            </ul>
-                    </div>
-                </div>
 
             </aside>
         </div>
