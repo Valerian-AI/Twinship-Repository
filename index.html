@@ -26,6 +26,34 @@
         <span class="close-button" title="Close">&times;</span>
     </div>
 
+    <div id="music-player">
+        <audio id="audio-source"></audio>
+        <div class="player-card">
+            <img src="placeholder-album-art.jpg" alt="Album Art" id="album-art">
+            <div class="song-info">
+                <h4 id="song-title">Select a Song</h4>
+                <p id="song-artist">from the Playlist</p>
+            </div>
+            <div class="progress-container" id="progress-container" title="Seek">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="time-stamps">
+                <span id="current-time">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+            <div class="controls">
+                <button id="prev-button" title="Previous">⏮</button>
+                <button id="play-pause-button" title="Play/Pause">▶️</button>
+                <button id="next-button" title="Next">⏭</button>
+            </div>
+        </div>
+        <div class="playlist-container">
+            <button id="playlist-toggle">☰ Playlist</button>
+            <ul id="playlist" class="hidden">
+                </ul>
+        </div>
+    </div>
+
     <header id="profile-header">
         <div class="header-background" id="banner-display">
             <button id="change-banner-button" class="admin-only hidden" title="Change Banner">✏️</button>
@@ -118,39 +146,7 @@
                     <h3>Repository of Stories</h3>
                     <div id="story-list"></div>
                 </section>
-                
-                <div id="music-player">
-                    <audio id="audio-source"></audio>
-                    <div class="player-card">
-                        <img src="placeholder-album-art.jpg" alt="Album Art" id="album-art">
-                        <div class="song-info">
-                            <h4 id="song-title">Select a Song</h4>
-                            <p id="song-artist">from the Playlist</p>
-                        </div>
-                        <div class="progress-container" id="progress-container" title="Seek">
-                            <div class="progress" id="progress"></div>
-                        </div>
-                        <div class="time-stamps">
-                            <span id="current-time">0:00</span>
-                            <span id="duration">0:00</span>
-                        </div>
-                        <div class="controls">
-                            <button id="prev-button" title="Previous">⏮</button>
-                            <button id="play-pause-button" title="Play/Pause">▶️</button>
-                            <button id="next-button" title="Next">⏭</button>
-                        </div>
-                        <div class="upload-form admin-only hidden" id="music-upload-form">
-                            <hr>
-                            <p>Upload .mp3 and matching cover</p>
-                            <input type="file" id="music-upload-input" accept=".mp3,.jpg,.png,.jpeg,.webp">
-                            <button id="music-upload-button">Upload Music File</button>
-                        </div>
-                    </div>
-                    <div class="playlist-container">
-                        <button id="playlist-toggle">☰ Playlist</button>
-                        <ul id="playlist" class="hidden"></ul>
-                    </div>
-                </div>
+
             </aside>
         </div>
     </main>

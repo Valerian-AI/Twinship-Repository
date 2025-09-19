@@ -78,33 +78,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const prevSong = () => {
         songIndex--;
-        if (songIndex < 0) {
-            songIndex = musicLibrary.length - 1;
-        }
+        if (songIndex < 0) { songIndex = musicLibrary.length - 1; }
         loadSong(musicLibrary[songIndex]);
         playSong();
     };
 
     const nextSong = () => {
         songIndex++;
-        if (songIndex > musicLibrary.length - 1) {
-            songIndex = 0;
-        }
+        if (songIndex > musicLibrary.length - 1) { songIndex = 0; }
         loadSong(musicLibrary[songIndex]);
         playSong();
     };
 
     const updateProgress = (e) => {
         const { duration, currentTime } = e.srcElement;
+        if (isNaN(duration)) return;
         const progressPercent = (currentTime / duration) * 100;
         elements.progress.style.width = `${progressPercent}%`;
         const formatTime = (time) => {
             if (isNaN(time)) return "0:00";
             const minutes = Math.floor(time / 60);
             let seconds = Math.floor(time % 60);
-            if (seconds < 10) {
-                seconds = `0${seconds}`;
-            }
+            if (seconds < 10) { seconds = `0${seconds}`; }
             return `${minutes}:${seconds}`;
         };
         elements.durationEl.textContent = formatTime(duration);
@@ -144,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sfw: [ '/assets/backgrounds/sfw/bg1.jpg', '/assets/backgrounds/sfw/bg2.jpg', '/assets/backgrounds/sfw/bg3.jpg', '/assets/backgrounds/sfw/bg4.jpg', '/assets/backgrounds/sfw/bg5.jpg' ],
         nsfw: [ '/assets/backgrounds/nsfw/bg1.jpg', '/assets/backgrounds/nsfw/bg2.jpg', '/assets/backgrounds/nsfw/bg3.jpg', '/assets/backgrounds/nsfw/bg4.jpg', '/assets/backgrounds/nsfw/bg5.jpg' ]
     };
-
+    
     const setBackground = (bgPath) => {
         document.body.style.backgroundImage = `url(${bgPath})`;
         localStorage.setItem('selectedBackground', bgPath);
@@ -260,8 +255,6 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.homeworkList.appendChild(li);
     };
 
-    // --- INITIALIZATION ---
-
     async function loadMusicLibrary() {
         try {
             const res = await fetch('/api/music');
@@ -281,7 +274,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     elements.playlist.appendChild(li);
                 });
             }
-        } catch (error) { console.error("Could not load music library", error); }
+        } catch (error) {
+            console.error("Could not load music library", error);
+        }
     }
 
     async function initializePage() {
@@ -289,24 +284,20 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('/api/data');
             const data = await response.json();
-            
             elements.username.childNodes[0].nodeValue = data.settings.username + ' ';
             elements.profilePic.src = data.settings.profilePicture;
             if(data.settings.banner) elements.banner.style.backgroundImage = `url(${data.settings.banner})`;
             elements.youtubeLink.href = data.settings.youtubeUrl;
-            
             elements.imageGrid.innerHTML = '';
             elements.moreImagesGrid.innerHTML = '';
             elements.moreImagesContainer.classList.add('hidden');
             data.galleryImages.forEach(addImageToGallery);
-            
             elements.gifGrid.innerHTML = '';
             data.gifs.forEach(item => elements.gifGrid.appendChild(createGridItem(item, 'gifs')));
             elements.storyList.innerHTML = '';
             data.stories.forEach(addStoryToList);
             elements.homeworkList.innerHTML = '';
             data.homework.forEach(addHomeworkToList);
-            
             if (isAdmin) {
                 new Sortable(elements.imageGrid, {
                     handle: '.drag-handle', animation: 150,
@@ -316,7 +307,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
             }
-        } catch (error) { console.error("Failed to initialize page data:", error); }
+        } catch (error) {
+            console.error("Failed to initialize page data:", error);
+        }
         await loadMusicLibrary();
     }
     
@@ -345,10 +338,25 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.progressContainer.addEventListener('click', setProgress);
     elements.audioPlayer.addEventListener('ended', nextSong);
     elements.playlistToggle.addEventListener('click', () => { elements.playlist.classList.toggle('hidden'); });
+
     elements.lightboxPrev.addEventListener('click', () => { if (currentIndex > 0) { currentIndex--; showImageAtIndex(currentIndex); } });
     elements.lightboxNext.addEventListener('click', () => { if (currentIndex < currentGallery.length - 1) { currentIndex++; showImageAtIndex(currentIndex); } });
-    elements.backgroundCategories.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') { const category = e.target.dataset.category; document.querySelectorAll('#background-categories button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); generateThumbnails(category); } });
-    elements.backgroundSwitcher.addEventListener('click', (e) => { if (e.target.classList.contains('bg-thumbnail')) setBackground(e.target.dataset.bgPath); });
+    
+    elements.backgroundCategories.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') {
+            const category = e.target.dataset.category;
+            document.querySelectorAll('#background-categories button').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            generateThumbnails(category);
+        }
+    });
+    
+    elements.backgroundSwitcher.addEventListener('click', (e) => {
+        if (e.target.classList.contains('bg-thumbnail')) {
+            setBackground(e.target.dataset.bgPath);
+        }
+    });
+
     elements.moreImagesTrigger.addEventListener('mouseenter', () => elements.moreImagesWidget.classList.remove('hidden'));
     elements.moreImagesContainer.addEventListener('mouseleave', () => elements.moreImagesWidget.classList.add('hidden'));
     elements.scrollLeftButton.addEventListener('click', () => { elements.moreImagesGrid.scrollLeft -= 110; });
@@ -387,7 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('banner-upload').onchange = async (e) => { if (!e.target.files[0]) return; const { path } = await universalUploader(e.target.files[0], 'banner'); if (path) elements.banner.style.backgroundImage = `url(${path})`; };
     
-    document.getElementById('story-form').addEventListener('submit', async (e) => { e.preventDefault(); const title = document.getElementById('story-title').value; const content = document.getElementById('story-content').value; const response = await fetch('/api/stories', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title, content }) }); addToList(await response.json()); e.target.reset(); });
+    document.getElementById('story-form').addEventListener('submit', async (e) => { e.preventDefault(); const title = document.getElementById('story-title').value; const content = document.getElementById('story-content').value; const response = await fetch('/api/stories', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title, content }) }); addStoryToList(await response.json()); e.target.reset(); });
     
     elements.chatForm.addEventListener('submit', (e) => { e.preventDefault(); if (elements.chatInput.value) { elements.socket.emit('chat message', elements.chatInput.value); elements.chatInput.value = ''; } });
     
