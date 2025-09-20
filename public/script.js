@@ -17,15 +17,25 @@ document.addEventListener("DOMContentLoaded", () => {
 // ---------------- SOCKET.IO INIT ----------------
 const socket = io();
 
+// ---------------- Gallery Data Storage ----------------
+let galleryData = {
+    sfw: [],
+    nsfw: []
+};
+let currentGalleryType = 'sfw';
+
 // ---------------- Uploader Helper ----------------
-async function uploadFile(file, type) {
+async function uploadFile(file, type, category = null) {
     if (!file) return;
 
-    console.log(`[uploader] uploading file "${file.name}" as type "${type}"`);
+    console.log(`[uploader] uploading file "${file.name}" as type "${type}"${category ? ` (${category})` : ''}`);
 
     const formData = new FormData();
     formData.append("file", file);
     formData.append("type", type);
+    if (category) {
+        formData.append("category", category);
+    }
 
     try {
         const res = await fetch("/upload", {
@@ -38,17 +48,26 @@ async function uploadFile(file, type) {
 
         console.log("[uploader] success", data);
 
-        // Append uploaded file depending on type
-        if (type === "gallery") {
-            addImageToGrid(data.path, "image-grid");
+        // Handle different upload types
+        if (type === "gallery" && category) {
+            // Add to appropriate gallery category
+            galleryData[category].push(data);
+            // If modal is open for this category, refresh it
+            const modal = document.getElementById('gallery-modal');
+            if (!modal.classList.contains('hidden') && currentGalleryType === category) {
+                populateGalleryModal(category);
+            }
         } else if (type === "gif") {
             addImageToGrid(data.path, "gif-grid");
         } else if (type === "homework") {
             addFileToList(data.path, "homework-list");
         }
 
+        return data;
+
     } catch (err) {
         console.error("[uploader] error", err);
+        throw err;
     }
 }
 
@@ -73,24 +92,115 @@ function addFileToList(src, listId) {
     list.appendChild(li);
 }
 
-// ---------------- Gallery Upload ----------------
-const galleryInput = document.getElementById("gallery-upload-input");
-const galleryUploadBtn = document.getElementById("gallery-upload-button");
+// ---------------- Gallery Modal Functions ----------------
+function openGalleryModal(category) {
+    currentGalleryType = category;
+    const modal = document.getElementById('gallery-modal');
+    const modalTitle = document.getElementById('gallery-modal-title');
+    
+    modalTitle.textContent = category.toUpperCase() + ' Gallery';
+    modal.classList.remove('hidden');
+    
+    populateGalleryModal(category);
+}
 
-galleryUploadBtn.addEventListener("click", () => {
-    if (galleryInput.files.length > 0) {
-        uploadFile(galleryInput.files[0], "gallery");
-        galleryInput.value = "";
+function closeGalleryModal() {
+    const modal = document.getElementById('gallery-modal');
+    modal.classList.add('hidden');
+}
+
+function populateGalleryModal(category) {
+    const grid = document.getElementById('gallery-modal-grid');
+    grid.innerHTML = '';
+    
+    const images = galleryData[category] || [];
+    
+    images.forEach((item, index) => {
+        const container = document.createElement('div');
+        container.className = 'grid-item';
+        
+        const img = document.createElement('img');
+        img.src = item.path;
+        img.alt = item.originalName || 'Gallery Image';
+        img.onclick = () => openLightbox(item, category, index);
+        
+        container.appendChild(img);
+        
+        // Add delete button for admin
+        if (isAdmin) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-button';
+            deleteBtn.innerHTML = '&times;';
+            deleteBtn.onclick = async (e) => {
+                e.stopPropagation();
+                if (!confirm('Are you sure you want to delete this image?')) return;
+                
+                try {
+                    await fetch('/api/media', {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            filePath: item.path, 
+                            type: 'gallery',
+                            category: category 
+                        })
+                    });
+                    
+                    // Remove from local data
+                    galleryData[category].splice(index, 1);
+                    // Refresh modal
+                    populateGalleryModal(category);
+                    
+                } catch (error) {
+                    console.error('Delete failed:', error);
+                    alert('Failed to delete image');
+                }
+            };
+            container.appendChild(deleteBtn);
+        }
+        
+        grid.appendChild(container);
+    });
+}
+
+// ---------------- Lightbox Functions ----------------
+let currentGallery = [];
+let currentIndex = 0;
+
+function openLightbox(clickedItem, galleryType, startIndex = 0) {
+    if (galleryType === 'sfw' || galleryType === 'nsfw') {
+        currentGallery = galleryData[galleryType].map(item => item.path);
+        currentIndex = startIndex;
     } else {
-        alert("Please select a file first.");
+        // Handle other gallery types (gifs, etc.)
+        const gallerySource = Array.from(document.querySelectorAll('#gif-grid .grid-item'));
+        currentGallery = gallerySource.map(item => item.dataset.filePath);
+        currentIndex = currentGallery.indexOf(clickedItem.path);
+        if (currentIndex === -1) currentIndex = 0;
     }
-});
+    
+    showImageAtIndex(currentIndex);
+    document.getElementById('lightbox').classList.remove('hidden');
+}
+
+function showImageAtIndex(index) {
+    const lightboxImage = document.querySelector('.lightbox-content');
+    const lightboxPrev = document.getElementById('lightbox-prev');
+    const lightboxNext = document.getElementById('lightbox-next');
+    
+    if (!lightboxImage || index < 0 || index >= currentGallery.length) return;
+    
+    lightboxImage.src = currentGallery[index];
+    
+    if (lightboxPrev) lightboxPrev.style.display = index === 0 ? 'none' : 'block';
+    if (lightboxNext) lightboxNext.style.display = index === currentGallery.length - 1 ? 'none' : 'block';
+}
 
 // ---------------- GIF Upload ----------------
 const gifInput = document.getElementById("gif-upload-input");
 const gifUploadBtn = document.getElementById("gif-upload-button");
 
-gifUploadBtn.addEventListener("click", () => {
+gifUploadBtn?.addEventListener("click", () => {
     if (gifInput.files.length > 0) {
         uploadFile(gifInput.files[0], "gif");
         gifInput.value = "";
@@ -103,7 +213,7 @@ gifUploadBtn.addEventListener("click", () => {
 const homeworkInput = document.getElementById("homework-upload-input");
 const homeworkUploadBtn = document.getElementById("homework-upload-button");
 
-homeworkUploadBtn.addEventListener("click", () => {
+homeworkUploadBtn?.addEventListener("click", () => {
     if (homeworkInput.files.length > 0) {
         uploadFile(homeworkInput.files[0], "homework");
         homeworkInput.value = "";
@@ -111,39 +221,6 @@ homeworkUploadBtn.addEventListener("click", () => {
         alert("Please select a file first.");
     }
 });
-
-// ---------------- Image Carousel ----------------
-const scrollLeftBtn = document.getElementById("scroll-left-button");
-const scrollRightBtn = document.getElementById("scroll-right-button");
-const moreImagesGrid = document.getElementById("more-images-grid");
-
-let scrollIndex = 0;
-const visibleCount = 3;
-
-function updateCarousel() {
-    const images = moreImagesGrid.querySelectorAll("img");
-    images.forEach((img, idx) => {
-        img.style.display = (idx >= scrollIndex && idx < scrollIndex + visibleCount) ? "inline-block" : "none";
-    });
-}
-
-scrollLeftBtn.addEventListener("click", () => {
-    if (scrollIndex > 0) {
-        scrollIndex--;
-        updateCarousel();
-    }
-});
-
-scrollRightBtn.addEventListener("click", () => {
-    const images = moreImagesGrid.querySelectorAll("img");
-    if (scrollIndex < images.length - visibleCount) {
-        scrollIndex++;
-        updateCarousel();
-    }
-});
-
-// Run once at start
-updateCarousel();
 
 // ---------------- Placeholder Fix ----------------
 document.getElementById("album-art").onerror = function () {
@@ -156,20 +233,17 @@ document.getElementById("profile-picture-display").onerror = function () {
     const urlParams = new URLSearchParams(window.location.search);
     const isAdmin = urlParams.get('admin') === 'true';
 
-    let currentGallery = [];
-    let currentIndex = 0;
     let musicLibrary = [];
     let songIndex = 0;
     let isPlaying = false;
 
-    // DOM elements (some may be null depending on which HTML variant you use)
+    // DOM elements
     const elements = {
         body: document.body,
         username: document.getElementById('username-display'),
         profilePic: document.getElementById('profile-picture-display'),
         banner: document.getElementById('banner-display'),
         youtubeLink: document.getElementById('youtube-link'),
-        imageGrid: document.getElementById('image-grid'),               // old layout
         gifGrid: document.getElementById('gif-grid'),
         storyList: document.getElementById('story-list'),
         homeworkList: document.getElementById('homework-list'),
@@ -193,23 +267,14 @@ document.getElementById("profile-picture-display").onerror = function () {
         chatForm: document.getElementById('chat-form'),
         chatInput: document.getElementById('chat-input'),
         messages: document.getElementById('messages'),
-        // socket might be undefined if socket.io isn't available; guard later
         socket: (typeof io === 'function') ? io() : null,
-        moreImagesContainer: document.getElementById('more-images-container'),
-        moreImagesTrigger: document.getElementById('more-images-trigger'),
-        moreImagesWidget: document.getElementById('more-images-widget'),
-        moreImagesGrid: document.getElementById('more-images-grid'),
-        scrollLeftButton: document.getElementById('scroll-left-button'),
-        scrollRightButton: document.getElementById('scroll-right-button'),
         backgroundCategories: document.getElementById('background-categories'),
         backgroundSwitcher: document.getElementById('background-switcher'),
-        musicUploadButton: document.getElementById('music-upload-button'),
-        musicUploadInput: document.getElementById('music-upload-input'),
-        // new carousel elements (if present)
-        carouselEl: document.getElementById('image-carousel'),
-        carouselWrapper: document.querySelector('.carousel-wrapper'),
-        carouselLeft: document.getElementById('carousel-left'),
-        carouselRight: document.getElementById('carousel-right')
+        // Gallery elements
+        galleryModal: document.getElementById('gallery-modal'),
+        galleryModalGrid: document.getElementById('gallery-modal-grid'),
+        modalGalleryUploadInput: document.getElementById('modal-gallery-upload-input'),
+        modalGalleryUploadButton: document.getElementById('modal-gallery-upload-button')
     };
 
     // --- HELPER FUNCTIONS ---
@@ -275,39 +340,6 @@ document.getElementById("profile-picture-display").onerror = function () {
         }
     };
 
-    const openLightbox = (clickedItem, galleryType) => {
-        let gallerySource;
-        if (galleryType === 'galleryImages') {
-            // prefer carousel if present, else old grid/more grid
-            if (elements.carouselEl) {
-                gallerySource = Array.from(document.querySelectorAll('#image-carousel .carousel-item img'));
-                // map to src strings to match previous logic
-                currentGallery = gallerySource.map(img => img.src);
-            } else {
-                gallerySource = Array.from(document.querySelectorAll('#image-grid .grid-item, #more-images-grid .grid-item'));
-                currentGallery = gallerySource.map(item => item.dataset.filePath);
-            }
-        } else {
-            gallerySource = Array.from(document.querySelectorAll('#gif-grid .grid-item'));
-            currentGallery = gallerySource.map(item => item.dataset.filePath);
-        }
-
-        // find index (clickedItem may be object with path property or an <img> element)
-        let clickedPath = clickedItem && clickedItem.path ? clickedItem.path : (clickedItem && clickedItem.src ? clickedItem.src : null);
-        currentIndex = currentGallery.indexOf(clickedPath);
-        if (currentIndex === -1) currentIndex = 0;
-        showImageAtIndex(currentIndex);
-        elements.lightbox && elements.lightbox.classList.remove('hidden');
-    };
-
-    const showImageAtIndex = (index) => {
-        if (!elements.lightboxImage) return;
-        if (index < 0 || index >= currentGallery.length) return;
-        elements.lightboxImage.src = currentGallery[index];
-        if (elements.lightboxPrev) elements.lightboxPrev.style.display = index === 0 ? 'none' : 'block';
-        if (elements.lightboxNext) elements.lightboxNext.style.display = index === currentGallery.length - 1 ? 'none' : 'block';
-    };
-
     const backgrounds = {
         sfw: [ '/assets/backgrounds/sfw/bg1.jpg', '/assets/backgrounds/sfw/bg2.jpg', '/assets/backgrounds/sfw/bg3.jpg', '/assets/backgrounds/sfw/bg4.jpg', '/assets/backgrounds/sfw/bg5.jpg' ],
         nsfw: [ '/assets/backgrounds/nsfw/bg1.jpg', '/assets/backgrounds/nsfw/bg2.jpg', '/assets/backgrounds/nsfw/bg3.jpg', '/assets/backgrounds/nsfw/bg4.jpg', '/assets/backgrounds/nsfw/bg5.jpg' ]
@@ -338,15 +370,7 @@ document.getElementById("profile-picture-display").onerror = function () {
         }
     };
 
-    // Helper to determine which gallery container to use
-    const hasCarousel = !!elements.carouselEl;
-    const galleryEl = elements.carouselEl || elements.imageGrid; // prefer carousel if present
-    const moreGridEl = elements.moreImagesGrid; // may be null
-
-    // We keep a small array for gallery items (used by old grid logic)
-    const galleryItems = [];
-
-    // Create grid item (old layout)
+    // Create grid item for GIFs and other content
     const createGridItem = (item, type) => {
         const container = document.createElement('div');
         container.className = 'grid-item';
@@ -367,86 +391,20 @@ document.getElementById("profile-picture-display").onerror = function () {
                 await initializePage();
             };
             container.appendChild(deleteBtn);
-            if (type === 'galleryImages') {
-                const dragHandle = document.createElement('span');
-                dragHandle.className = 'drag-handle';
-                dragHandle.textContent = '☰';
-                container.appendChild(dragHandle);
-            }
         }
         return container;
     };
 
-    // Create carousel item (new layout)
-    const createCarouselItem = (item, type) => {
-        const container = document.createElement('div');
-        container.className = 'carousel-item';
-        container.dataset.filePath = item.path;
-        container.dataset.originalName = item.originalName || '';
-        const img = document.createElement('img');
-        img.src = item.path;
-        img.onclick = () => openLightbox({ path: item.path }, type);
-        container.appendChild(img);
-        if (isAdmin) {
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'delete-button';
-            deleteBtn.innerHTML = '&times;';
-            deleteBtn.onclick = async (e) => {
-                e.stopPropagation();
-                if (!confirm('Are you sure?')) return;
-                await fetch('/api/media', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filePath: item.path, type }) });
-                await initializePage();
-            };
-            // overlay delete button (positioned with CSS .delete-button exists)
-            container.appendChild(deleteBtn);
-        }
-        return container;
-    };
-
-    // Append image into gallery depending on layout
-    const addImageToGallery = (item) => {
-        // If carousel exists, append there (we use horizontal scrolling)
-        if (hasCarousel && elements.carouselEl) {
-            const carouselItem = createCarouselItem(item, 'galleryImages');
-            elements.carouselEl.appendChild(carouselItem);
-            // optional: scroll to end so newly uploaded image is visible
-            // small timeout to allow layout
-            setTimeout(() => {
-                try {
-                    elements.carouselEl.scrollTo({ left: elements.carouselEl.scrollWidth, behavior: 'smooth' });
-                } catch (err) { /* ignore */ }
-            }, 100);
-            return;
-        }
-
-        // Old layout: show up to 3 items in the main grid, rest goes to more-images-grid
-        if (elements.imageGrid) {
-            if (elements.imageGrid.children.length < 3) {
-                elements.imageGrid.appendChild(createGridItem(item, 'galleryImages'));
-            } else {
-                if (elements.moreImagesContainer) elements.moreImagesContainer.classList.remove('hidden');
-                if (elements.moreImagesGrid) elements.moreImagesGrid.appendChild(createGridItem(item, 'galleryImages'));
-                if (elements.moreImagesTrigger) {
-                    const countSpan = elements.moreImagesTrigger.querySelector('span');
-                    if (countSpan) countSpan.textContent = elements.moreImagesGrid.children.length;
-                }
-            }
-        } else {
-            // fallback: attempt to append into galleryEl if present
-            if (galleryEl) {
-                const el = createGridItem(item, 'galleryImages');
-                galleryEl.appendChild(el);
-            }
-        }
-    };
-
-    // Universal uploader unchanged, only logs more info
-    const universalUploader = async (file, type) => {
+    // Universal uploader
+    const universalUploader = async (file, type, category = null) => {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('type', type);
+        if (category) {
+            formData.append('category', category);
+        }
         try {
-            console.log(`[uploader] uploading file "${file.name}" as type "${type}"`);
+            console.log(`[uploader] uploading file "${file.name}" as type "${type}"${category ? ` (${category})` : ''}`);
             const response = await fetch('/upload', { method: 'POST', body: formData });
             if (!response.ok) {
                 const text = await response.text();
@@ -533,14 +491,9 @@ document.getElementById("profile-picture-display").onerror = function () {
             if (data.settings.banner && elements.banner) elements.banner.style.backgroundImage = `url(${data.settings.banner})`;
             if (elements.youtubeLink) elements.youtubeLink.href = data.settings.youtubeUrl;
 
-            // Clear gallery areas (both possible layouts)
-            if (elements.imageGrid) elements.imageGrid.innerHTML = '';
-            if (elements.moreImagesGrid) elements.moreImagesGrid.innerHTML = '';
-            if (elements.carouselEl) elements.carouselEl.innerHTML = '';
-            if (elements.moreImagesContainer) elements.moreImagesContainer.classList.add('hidden');
-
-            // Add gallery images using unified handler
-            (data.galleryImages || []).forEach(addImageToGallery);
+            // Load gallery data by category
+            galleryData.sfw = (data.galleryImages || []).filter(img => img.category === 'sfw' || !img.category);
+            galleryData.nsfw = (data.galleryImages || []).filter(img => img.category === 'nsfw');
 
             // GIFs
             if (elements.gifGrid) {
@@ -560,16 +513,6 @@ document.getElementById("profile-picture-display").onerror = function () {
                 (data.homework || []).forEach(addHomeworkToList);
             }
 
-            if (isAdmin && elements.imageGrid) {
-                // apply Sortable only if the old grid is present
-                new Sortable(elements.imageGrid, {
-                    handle: '.drag-handle', animation: 150,
-                    onEnd: async (evt) => {
-                        const newOrder = Array.from(evt.target.children).map(item => ({ path: item.dataset.filePath, originalName: item.dataset.originalName }));
-                        await fetch('/api/gallery/reorder', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newOrder }) });
-                    }
-                });
-            }
         } catch (error) {
             console.error("Failed to initialize page data:", error);
         }
@@ -597,6 +540,40 @@ document.getElementById("profile-picture-display").onerror = function () {
 
     // --- EVENT LISTENERS ---
 
+    // Gallery Widget Click Handlers
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('.gallery-widget')) {
+            const widget = e.target.closest('.gallery-widget');
+            const category = widget.dataset.category;
+            openGalleryModal(category);
+        }
+    });
+
+    // Gallery Modal Close Handlers
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('gallery-close-button')) {
+            closeGalleryModal();
+        }
+        if (e.target.id === 'gallery-modal' && !e.target.closest('.gallery-modal-content')) {
+            closeGalleryModal();
+        }
+    });
+
+    // Modal Gallery Upload Handler
+    if (elements.modalGalleryUploadButton) {
+        elements.modalGalleryUploadButton.addEventListener('click', async () => {
+            const input = elements.modalGalleryUploadInput;
+            if (!input.files[0]) return alert('Please select a file.');
+            
+            const data = await universalUploader(input.files[0], 'gallery', currentGalleryType);
+            if (data) {
+                galleryData[currentGalleryType].push(data);
+                populateGalleryModal(currentGalleryType);
+                input.value = '';
+            }
+        });
+    }
+
     // Audio controls
     elements.playPauseBtn && elements.playPauseBtn.addEventListener('click', () => (isPlaying ? pauseSong() : playSong()));
     elements.prevBtn && elements.prevBtn.addEventListener('click', prevSong);
@@ -606,9 +583,23 @@ document.getElementById("profile-picture-display").onerror = function () {
     elements.audioPlayer && elements.audioPlayer.addEventListener('ended', nextSong);
     elements.playlistToggle && elements.playlistToggle.addEventListener('click', () => { elements.playlist && elements.playlist.classList.toggle('hidden'); });
 
-    // Lightbox nav
-    elements.lightboxPrev && elements.lightboxPrev.addEventListener('click', () => { if (currentIndex > 0) { currentIndex--; showImageAtIndex(currentIndex); } });
-    elements.lightboxNext && elements.lightboxNext.addEventListener('click', () => { if (currentIndex < currentGallery.length - 1) { currentIndex++; showImageAtIndex(currentIndex); } });
+    // Lightbox navigation
+    elements.lightboxPrev && elements.lightboxPrev.addEventListener('click', () => { 
+        if (currentIndex > 0) { 
+            currentIndex--; 
+            showImageAtIndex(currentIndex); 
+        } 
+    });
+    elements.lightboxNext && elements.lightboxNext.addEventListener('click', () => { 
+        if (currentIndex < currentGallery.length - 1) { 
+            currentIndex++; 
+            showImageAtIndex(currentIndex); 
+        } 
+    });
+
+    // Close lightbox
+    elements.lightbox && elements.lightbox.querySelector('.close-button') && 
+    (elements.lightbox.querySelector('.close-button').onclick = () => elements.lightbox.classList.add('hidden'));
 
     // Background categories
     elements.backgroundCategories && elements.backgroundCategories.addEventListener('click', (e) => {
@@ -627,23 +618,6 @@ document.getElementById("profile-picture-display").onerror = function () {
         }
     });
 
-    // More images hover widget and scroll arrows (old layout)
-    elements.moreImagesTrigger && elements.moreImagesTrigger.addEventListener('mouseenter', () => elements.moreImagesWidget && elements.moreImagesWidget.classList.remove('hidden'));
-    elements.moreImagesContainer && elements.moreImagesContainer.addEventListener('mouseleave', () => elements.moreImagesWidget && elements.moreImagesWidget.classList.add('hidden'));
-    elements.scrollLeftButton && elements.scrollLeftButton.addEventListener('click', () => { elements.moreImagesGrid && (elements.moreImagesGrid.scrollLeft -= 110); });
-    elements.scrollRightButton && elements.scrollRightButton.addEventListener('click', () => { elements.moreImagesGrid && (elements.moreImagesGrid.scrollLeft += 110); });
-
-    // Carousel arrow behavior (new layout)
-    if (elements.carouselLeft && elements.carouselRight && elements.carouselEl) {
-        const scrollAmount = 190; // item width + gap (adjust if your CSS differs)
-        elements.carouselLeft.addEventListener('click', () => {
-            elements.carouselEl.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-        });
-        elements.carouselRight.addEventListener('click', () => {
-            elements.carouselEl.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-        });
-    }
-
     // Admin controls
     if (isAdmin) {
         document.getElementById('exit-admin-button') && (document.getElementById('exit-admin-button').onclick = () => { window.location.search = ''; });
@@ -659,21 +633,9 @@ document.getElementById("profile-picture-display").onerror = function () {
             }
         });
         document.getElementById('admin-fab') && (document.getElementById('admin-fab').onclick = () => document.getElementById('admin-menu').classList.toggle('hidden'));
-
-        if (elements.musicUploadButton && elements.musicUploadInput) {
-            elements.musicUploadButton.addEventListener('click', async () => {
-                const input = elements.musicUploadInput;
-                if (!input.files[0]) return alert('Please select a music or cover file.');
-                const data = await universalUploader(input.files[0], 'music');
-                if (data) { alert(`Successfully uploaded ${data.originalName}`); await loadMusicLibrary(); }
-                input.value = '';
-            });
-        }
     }
 
     themeToggleButton && themeToggleButton.addEventListener('click', () => setTheme(document.body.classList.contains('dark-theme') ? 'light' : 'dark'));
-
-    elements.lightbox && (elements.lightbox.querySelector('.close-button') && (elements.lightbox.querySelector('.close-button').onclick = () => elements.lightbox.classList.add('hidden')));
 
     // Profile picture upload click
     elements.profilePic && (elements.profilePic.onclick = () => document.getElementById('profile-picture-upload') && document.getElementById('profile-picture-upload').click());
@@ -730,115 +692,24 @@ document.getElementById("profile-picture-display").onerror = function () {
         });
     }
 
-    // --- UPLOAD HANDLING (robust) ---
-    // This function wires a choose button + upload button + hidden input
-    const setupUploadPair = (options) => {
-        // options: { chooseBtnId, uploadBtnId, inputId, type, onSuccess (function) }
-        const chooseBtn = document.getElementById(options.chooseBtnId);
-        const uploadBtn = document.getElementById(options.uploadBtnId);
-        const input = document.getElementById(options.inputId);
-
-        if (!input) {
-            console.warn(`[upload] input "${options.inputId}" not found`);
-            return;
-        }
-
-        // If choose or upload button missing, try to find them inside the same parent .upload-form
-        if (!chooseBtn || !uploadBtn) {
-            const parent = input.closest('.upload-form');
-            if (parent) {
-                if (!chooseBtn) chooseBtn = parent.querySelector('.choose-button, .glass-button, button');
-                if (!uploadBtn) {
-                    // choose the last button that likely is Upload
-                    const buttons = Array.from(parent.querySelectorAll('button'));
-                    uploadBtn = buttons.find(b => b.id && b.id.includes('upload')) || buttons[buttons.length - 1];
-                }
+    // Keyboard shortcuts for lightbox
+    document.addEventListener('keydown', (e) => {
+        if (!elements.lightbox.classList.contains('hidden')) {
+            if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                currentIndex--;
+                showImageAtIndex(currentIndex);
+            } else if (e.key === 'ArrowRight' && currentIndex < currentGallery.length - 1) {
+                currentIndex++;
+                showImageAtIndex(currentIndex);
+            } else if (e.key === 'Escape') {
+                elements.lightbox.classList.add('hidden');
             }
         }
-
-        if (chooseBtn) {
-            // ensure it doesn't submit any form accidentally
-            chooseBtn.setAttribute('type', 'button');
-            chooseBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                input.click();
-            });
-        }
-
-        if (uploadBtn) {
-            uploadBtn.setAttribute('type', 'button');
-            // Initially disable upload button until file chosen
-            uploadBtn.disabled = !input.files || input.files.length === 0;
-
-            uploadBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                if (!input.files || !input.files[0]) {
-                    alert('Please select a file.');
-                    return;
-                }
-                uploadBtn.disabled = true;
-                const file = input.files[0];
-                const data = await universalUploader(file, options.type);
-                if (data) {
-                    // call onSuccess
-                    try { options.onSuccess && options.onSuccess(data); } catch (err) { console.error(err); }
-                }
-                input.value = '';
-                uploadBtn.disabled = false;
-            });
-        }
-
-        // when file selected, enable upload button
-        input.addEventListener('change', () => {
-            const hasFile = input.files && input.files.length > 0;
-            if (uploadBtn) uploadBtn.disabled = !hasFile;
-            // optional: auto-upload when file selected - comment out if not desired
-            // if (hasFile) uploadBtn && uploadBtn.click();
-        });
-    };
-
-    // Attach upload pairs for gallery, gif and homework
-    // We expect the following ids from your index.html:
-    // gallery-choose-button, gallery-upload-button, gallery-upload-input
-    // gif-choose-button, gif-upload-button, gif-upload-input
-    // homework-choose-button, homework-upload-button, homework-upload-input
-    // The code will gracefully handle cases where buttons are named differently if they are in the same .upload-form as the input.
-
-    setupUploadPair({
-        chooseBtnId: 'gallery-choose-button',
-        uploadBtnId: 'gallery-upload-button',
-        inputId: 'gallery-upload-input',
-        type: 'gallery',
-        onSuccess: (data) => {
-            // add to gallery UI
-            addImageToGallery(data);
+        
+        if (!elements.galleryModal.classList.contains('hidden') && e.key === 'Escape') {
+            closeGalleryModal();
         }
     });
-
-    setupUploadPair({
-        chooseBtnId: 'gif-choose-button',
-        uploadBtnId: 'gif-upload-button',
-        inputId: 'gif-upload-input',
-        type: 'gif',
-        onSuccess: (data) => {
-            elements.gifGrid && elements.gifGrid.appendChild(createGridItem(data, 'gifs'));
-        }
-    });
-
-    setupUploadPair({
-        chooseBtnId: 'homework-choose-button',
-        uploadBtnId: 'homework-upload-button',
-        inputId: 'homework-upload-input',
-        type: 'homework',
-        onSuccess: (data) => {
-            addHomeworkToList(data);
-        }
-    });
-
-    // Keep legacy setupUpload calls commented out (we replaced them with setupUploadPair).
-    // setupUpload('gallery-upload-button', 'gallery-upload-input', 'gallery', addImageToGallery);
-
-    // profile pic, banner, and other previously defined handlers are above
 
     // end of DOMContentLoaded
 });

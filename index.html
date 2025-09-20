@@ -28,6 +28,22 @@
         <span class="close-button" title="Close">&times;</span>
     </div>
 
+    <!-- Gallery Selection Modal -->
+    <div id="gallery-modal" class="gallery-modal hidden">
+        <div class="gallery-modal-content">
+            <span class="gallery-close-button">&times;</span>
+            <h2 id="gallery-modal-title">Gallery</h2>
+            <div class="gallery-upload-section admin-only hidden">
+                <div class="upload-form">
+                    <label for="modal-gallery-upload-input" class="glass-button">Choose File</label>
+                    <input type="file" id="modal-gallery-upload-input" accept=".png,.jpg,.jpeg,.webp" hidden>
+                    <button id="modal-gallery-upload-button" class="glass-button upload-btn">Upload Image</button>
+                </div>
+            </div>
+            <div class="gallery-grid" id="gallery-modal-grid"></div>
+        </div>
+    </div>
+
     <div id="music-player">
         <audio id="audio-source"></audio>
         <div class="player-card">
@@ -44,9 +60,9 @@
                 <span id="duration">0:00</span>
             </div>
             <div class="controls">
-                <button id="prev-button" title="Previous">⏮</button>
+                <button id="prev-button" title="Previous">⮜</button>
                 <button id="play-pause-button" title="Play/Pause">▶️</button>
-                <button id="next-button" title="Next">⏭</button>
+                <button id="next-button" title="Next">⮞</button>
             </div>
         </div>
         <div class="playlist-container">
@@ -80,23 +96,27 @@
     <main>
         <div class="main-layout">
             <div class="content-column">
-                <!-- GALLERY -->
+                <!-- GALLERY WIDGETS -->
                 <section id="gallery-section">
                     <h2>Image Repository</h2>
-                    <div class="upload-form">
-                        <label for="gallery-upload-input" class="custom-file-upload">Choose File</label>
-                        <input type="file" id="gallery-upload-input" accept=".png,.jpg,.jpeg,.webp">
-                        <button id="gallery-upload-button" class="upload-btn">Upload Image</button>
-                    </div>
-                    <div class="grid-container" id="image-grid"></div>
-                     <div id="more-images-container" class="hidden">
-                        <div id="more-images-trigger">
-                            +<span>0</span>
+                    <div class="gallery-widgets">
+                        <div class="gallery-widget" data-category="sfw">
+                            <div class="widget-cover">
+                                <img src="/assets/gallery-covers/sfw-cover.jpg" alt="SFW Gallery" class="cover-image">
+                                <div class="widget-overlay">
+                                    <h3>SFW Gallery</h3>
+                                    <p>Safe for work images</p>
+                                </div>
+                            </div>
                         </div>
-                        <div id="more-images-widget" class="hidden">
-                            <button class="scroll-arrow left" id="scroll-left-button">◄</button>
-                            <div id="more-images-grid"></div>
-                            <button class="scroll-arrow right" id="scroll-right-button">►</button>
+                        <div class="gallery-widget" data-category="nsfw">
+                            <div class="widget-cover">
+                                <img src="/assets/gallery-covers/nsfw-cover.jpg" alt="NSFW Gallery" class="cover-image">
+                                <div class="widget-overlay">
+                                    <h3>NSFW Gallery</h3>
+                                    <p>Not safe for work images</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -170,4 +190,4 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
 </body>
-</html>
+</html
