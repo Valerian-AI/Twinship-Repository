@@ -401,3 +401,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     elements.socket.on('chat message', (msg) => { const item = document.createElement('li'); item.textContent = msg; elements.messages.appendChild(item); elements.messages.scrollTop = elements.messages.scrollHeight; });
 });
+// Lenis smooth scrolling setup
+const lenis = new Lenis({
+  duration: 1.2,    // adjust smoothness speed
+  easing: (t) => t, // linear easing, replace if you want custom easing
+  smooth: true,
+})
+
+function raf(time) {
+  lenis.raf(time)
+  requestAnimationFrame(raf)
+}
+
+requestAnimationFrame(raf)
