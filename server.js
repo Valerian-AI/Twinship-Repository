@@ -15,55 +15,9 @@ const io = new Server(server);
 const PORT = 3000;
 
 // --- Database Connection ---
-const connectDB = async () => {
-    try {
-        const conn = await mongoose.connect(process.env.DATABASE_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            serverSelectionTimeoutMS: 30000, // 30 seconds
-            connectTimeoutMS: 30000, // 30 seconds
-            socketTimeoutMS: 30000, // 30 seconds
-            bufferMaxEntries: 0,
-            maxPoolSize: 10,
-            minPoolSize: 1,
-            retryWrites: true,
-            w: 'majority'
-        });
-        console.log(`MongoDB Connected: ${conn.connection.host}`);
-    } catch (error) {
-        console.error('MongoDB connection error:', error);
-        process.exit(1);
-    }
-};
-
-// Connect to database
-connectDB();
-
-// Mongoose connection event handlers
-mongoose.connection.on('connected', () => {
-    console.log('Mongoose connected to MongoDB Atlas');
-});
-
-mongoose.connection.on('error', (err) => {
-    console.error('Mongoose connection error:', err);
-});
-
-mongoose.connection.on('disconnected', () => {
-    console.log('Mongoose disconnected from MongoDB Atlas');
-});
-
-// Helper function for database operations with retry logic
-const retryOperation = async (operation, maxRetries = 3) => {
-    for (let i = 0; i < maxRetries; i++) {
-        try {
-            return await operation();
-        } catch (error) {
-            console.log(`Operation failed (attempt ${i + 1}/${maxRetries}):`, error.message);
-            if (i === maxRetries - 1) throw error;
-            await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1))); // Progressive delay
-        }
-    }
-};
+mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log('Connected to MongoDB Atlas!'))
+    .catch(err => console.error('Could not connect to MongoDB Atlas...', err));
 
 // --- Mongoose Schemas (Blueprints for our data) ---
 const MediaSchema = new mongoose.Schema({ 
@@ -114,15 +68,15 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         };
         
         if (type === 'gallery') {
-            await retryOperation(() => GalleryImage.create(fileData));
+            await GalleryImage.create(fileData);
         } else if (type === 'gif') {
-            await retryOperation(() => Gif.create(fileData));
+            await Gif.create(fileData);
         } else if (type === 'homework') {
-            await retryOperation(() => Homework.create(fileData));
+            await Homework.create(fileData);
         } else if (type === 'profile') {
-            await retryOperation(() => Settings.updateOne({}, { profilePicture: filePath }, { upsert: true }));
+            await Settings.updateOne({}, { profilePicture: filePath }, { upsert: true });
         } else if (type === 'banner') {
-            await retryOperation(() => Settings.updateOne({}, { banner: filePath }, { upsert: true }));
+            await Settings.updateOne({}, { banner: filePath }, { upsert: true });
         }
         
         res.json({ 
