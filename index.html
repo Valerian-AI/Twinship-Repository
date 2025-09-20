@@ -51,8 +51,7 @@
         </div>
         <div class="playlist-container">
             <button id="playlist-toggle">☰ Playlist</button>
-            <ul id="playlist" class="hidden">
-                </ul>
+            <ul id="playlist" class="hidden"></ul>
         </div>
     </div>
 
@@ -81,11 +80,13 @@
     <main>
         <div class="main-layout">
             <div class="content-column">
+                <!-- GALLERY -->
                 <section id="gallery-section">
                     <h2>Image Repository</h2>
                     <div class="upload-form">
+                        <label for="gallery-upload-input" class="custom-file-upload">Choose File</label>
                         <input type="file" id="gallery-upload-input" accept=".png,.jpg,.jpeg,.webp">
-                        <button id="gallery-upload-button">Upload Image</button>
+                        <button id="gallery-upload-button" class="upload-btn">Upload Image</button>
                     </div>
                     <div class="grid-container" id="image-grid"></div>
                      <div id="more-images-container" class="hidden">
@@ -100,15 +101,18 @@
                     </div>
                 </section>
                 
+                <!-- GIF -->
                 <section id="gif-section">
                     <h2>GIF Repository</h2>
                     <div class="upload-form">
+                        <label for="gif-upload-input" class="custom-file-upload">Choose File</label>
                         <input type="file" id="gif-upload-input" accept=".gif">
-                        <button id="gif-upload-button">Upload GIF</button>
+                        <button id="gif-upload-button" class="upload-btn">Upload GIF</button>
                     </div>
                     <div class="grid-container" id="gif-grid"></div>
                 </section>
 
+                <!-- WRITING -->
                 <section id="writings-section">
                     <h2>Create a New Story</h2>
                     <form id="story-form">
@@ -118,6 +122,7 @@
                     </form>
                 </section>
                 
+                <!-- CHAT -->
                 <section id="chatroom-section">
                     <h2>Live Chat</h2>
                     <div id="chat-container">
@@ -128,11 +133,13 @@
                     </div>
                 </section>
                 
+                <!-- HOMEWORK -->
                 <section id="homework-section">
                     <h2>Homework Repository</h2>
                     <div class="upload-form">
+                        <label for="homework-upload-input" class="custom-file-upload">Choose File</label>
                         <input type="file" id="homework-upload-input">
-                        <button id="homework-upload-button">Upload File</button>
+                        <button id="homework-upload-button" class="upload-btn">Upload File</button>
                     </div>
                     <ul id="homework-list" class="file-list"></ul>
                 </section>
