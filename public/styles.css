@@ -572,3 +572,18 @@ body.dark-theme .carousel-arrow {
     .carousel-item { min-width: 110px; height: 90px; }
     .carousel-arrow { height: 90px; padding: 0 8px; font-size: 1rem; }
 }
+#username-display {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* UPDATED: Simplified button style */
+#change-name-button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    padding: 5px;
+    line-height: 1; /* Helps with alignment */
+}
