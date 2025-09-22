@@ -378,29 +378,7 @@ POST /api/sync-database        # Database maintenance
    - Upload assets through admin interface post-deployment
    - Or include in repository before deployment
 
-### Vercel Deployment
 
-1. **Install Vercel CLI**
-```bash
-npm i -g vercel
-```
-
-2. **Deploy**
-```bash
-vercel --prod
-```
-
-3. **Environment Variables**
-Configure through Vercel dashboard or CLI
-
-### Environment Variables
-```env
-DATABASE_URL=mongodb+srv://<user>:<password>@cluster.mongodb.net/<database>
-PORT=3000
-NODE_ENV=production
-```
-
-## Troubleshooting
 
 ### Common Issues
 
