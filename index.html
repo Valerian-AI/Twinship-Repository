@@ -7,25 +7,56 @@
     <link rel="icon" type="image/png" href="/assets/favicon-evil.png">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <!-- Lenis smooth scrolling -->
     <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.1.14/dist/lenis.min.js"></script>
 </head>
 <body>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container"></div>
 
     <div id="admin-tools" class="admin-only hidden">
         <button id="admin-fab" title="Admin Tools">🛠️</button>
         <div id="admin-menu" class="hidden">
             <div class="menu-header">Admin Tools</div>
             <button id="clean-db-button">Clean Orphaned Entries</button>
+            <button id="remove-banner-button">Remove Banner</button>
             <button id="exit-admin-button">View as User</button>
         </div>
     </div>
 
+    <!-- Lightbox -->
     <div id="lightbox" class="hidden">
         <button class="lightbox-arrow prev" id="lightbox-prev" title="Previous image">◄</button>
         <img src="" alt="Enlarged view" class="lightbox-content">
         <button class="lightbox-arrow next" id="lightbox-next" title="Next image">►</button>
         <span class="close-button" title="Close">&times;</span>
+    </div>
+
+    <!-- Story Viewer Modal -->
+    <div id="story-modal" class="story-modal hidden">
+        <div class="story-modal-content">
+            <span class="story-close-button">&times;</span>
+            <div class="story-header">
+                <h2 id="story-modal-title">Story Title</h2>
+                <div class="story-navigation">
+                    <button id="story-prev" class="story-nav-btn">◄ Previous</button>
+                    <span id="story-page-info">Page 1 of 1</span>
+                    <button id="story-next" class="story-nav-btn">Next ►</button>
+                </div>
+            </div>
+            <div class="story-content" id="story-modal-content">
+                <p>Story content will appear here...</p>
+            </div>
+            <div class="story-comments-section">
+                <h3>Comments</h3>
+                <form id="comment-form" class="comment-form">
+                    <input type="text" id="comment-author" placeholder="Your name" required>
+                    <textarea id="comment-content" placeholder="Add a comment..." required></textarea>
+                    <button type="submit">Post Comment</button>
+                </form>
+                <div id="comments-list" class="comments-list"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Gallery Selection Modal -->
@@ -35,12 +66,100 @@
             <h2 id="gallery-modal-title">Gallery</h2>
             <div class="gallery-upload-section admin-only hidden">
                 <div class="upload-form">
-                    <label for="modal-gallery-upload-input" class="glass-button">Choose File</label>
-                    <input type="file" id="modal-gallery-upload-input" accept=".png,.jpg,.jpeg,.webp" hidden>
-                    <button id="modal-gallery-upload-button" class="glass-button upload-btn">Upload Image</button>
+                    <label for="modal-gallery-upload-input" class="glass-button">Choose Files</label>
+                    <input type="file" id="modal-gallery-upload-input" accept=".png,.jpg,.jpeg,.webp" multiple hidden>
+                    <button id="modal-gallery-upload-button" class="glass-button upload-btn">Upload Images</button>
                 </div>
             </div>
             <div class="gallery-grid" id="gallery-modal-grid"></div>
+        </div>
+    </div>
+
+    <!-- Homework Categories Modal -->
+    <div id="homework-modal" class="homework-modal hidden">
+        <div class="homework-modal-content">
+            <span class="homework-close-button">&times;</span>
+            <h2>Project Repository</h2>
+            <div class="homework-upload-section admin-only hidden">
+                <div class="upload-form">
+                    <label for="modal-homework-upload-input" class="glass-button">Choose Files</label>
+                    <input type="file" id="modal-homework-upload-input" accept=".pdf,.docx,.doc,.dwg,.ppt,.pptx,.sldprt,.sldasm" multiple hidden>
+                    <select id="homework-category-select">
+                        <option value="word">Word Documents</option>
+                        <option value="pdf">PDF Documents</option>
+                        <option value="autocad">AutoCAD Projects</option>
+                        <option value="solidworks">SolidWorks</option>
+                        <option value="powerpoint">PowerPoint</option>
+                    </select>
+                    <button id="modal-homework-upload-button" class="glass-button upload-btn">Upload Files</button>
+                </div>
+            </div>
+            <div class="homework-categories">
+                <div class="homework-widget" data-category="word">
+                    <div class="widget-cover">
+                        <img src="/assets/icons/word-icon.png" alt="Word Documents" class="cover-image">
+                        <div class="widget-overlay">
+                            <h3>Word Documents</h3>
+                            <p>DOC and DOCX files</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="homework-widget" data-category="pdf">
+                    <div class="widget-cover">
+                        <img src="/assets/icons/pdf-icon.png" alt="PDF Documents" class="cover-image">
+                        <div class="widget-overlay">
+                            <h3>PDF Documents</h3>
+                            <p>Portable document files</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="homework-widget" data-category="autocad">
+                    <div class="widget-cover">
+                        <img src="/assets/icons/autocad-icon.png" alt="AutoCAD Projects" class="cover-image">
+                        <div class="widget-overlay">
+                            <h3>AutoCAD Projects</h3>
+                            <p>DWG files</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="homework-widget" data-category="solidworks">
+                    <div class="widget-cover">
+                        <img src="/assets/icons/solidworks-icon.png" alt="SolidWorks" class="cover-image">
+                        <div class="widget-overlay">
+                            <h3>SolidWorks</h3>
+                            <p>SLDPRT and SLDASM files</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="homework-widget" data-category="powerpoint">
+                    <div class="widget-cover">
+                        <img src="/assets/icons/powerpoint-icon.png" alt="PowerPoint" class="cover-image">
+                        <div class="widget-overlay">
+                            <h3>PowerPoint</h3>
+                            <p>PPT and PPTX files</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="homework-files-list" id="homework-files-list"></div>
+        </div>
+    </div>
+
+    <!-- Stories List Modal -->
+    <div id="stories-list-modal" class="stories-list-modal hidden">
+        <div class="stories-list-modal-content">
+            <span class="stories-list-close-button">&times;</span>
+            <div class="stories-header">
+                <h2>Valerian Sci-fi Collection</h2>
+                <div class="stories-search">
+                    <input type="text" id="stories-search-input" placeholder="Search stories..." />
+                </div>
+                <div class="stories-upload admin-only hidden">
+                    <label for="story-upload-input" class="glass-button">Upload Stories</label>
+                    <input type="file" id="story-upload-input" accept=".pdf,.docx,.doc" multiple hidden>
+                </div>
+            </div>
+            <div id="all-stories-list" class="all-stories-list"></div>
         </div>
     </div>
 
@@ -73,16 +192,68 @@
 
     <header id="profile-header">
         <div class="header-background" id="banner-display">
+            <!-- Clock Widget -->
+            <div id="clock-widget" class="clock-widget">
+                <div class="clock-time" id="clock-time">12:00 PM</div>
+                <div class="clock-date" id="clock-date">Monday, Jan 1</div>
+            </div>
+            
             <button id="change-banner-button" class="admin-only hidden" title="Change Banner">✏️</button>
+            <button id="drag-banner-button" class="admin-only hidden" title="Adjust Banner Position">🖱️</button>
             <input type="file" id="banner-upload" accept="image/*" hidden>
         </div>
         <div class="profile-info">
             <img src="placeholder-profile.jpg" alt="Profile Picture" class="profile-picture" id="profile-picture-display" title="Click to change profile picture">
             <input type="file" id="profile-picture-upload" accept="image/*" hidden>
             <div class="username-container">
-    <h1 id="username-display">Your Name</h1>
-    <button id="change-name-button" class="admin-only hidden" title="Change Name">✏️</button>
-</div>
+                <h1 id="username-display">Your Name</h1>
+                <button id="change-name-button" class="admin-only hidden" title="Change Name">✏️</button>
+            </div>
+        </div>
+        
+        <!-- Social Media Widgets -->
+        <div class="social-widgets">
+            <div class="social-widget youtube-widget">
+                <img src="/assets/icons/youtube-icon.png" alt="YouTube" id="youtube-avatar">
+                <div class="social-info">
+                    <h4>YouTube</h4>
+                    <a href="#" id="youtube-link" target="_blank" rel="noopener noreferrer" id="youtube-name">Visit Channel</a>
+                </div>
+                <button class="admin-only hidden social-edit-btn" data-social="youtube" title="Edit">✏️</button>
+            </div>
+            
+            <div class="social-widget steam-widget">
+                <img src="/assets/icons/steam-icon.png" alt="Steam" id="steam-avatar">
+                <div class="social-info">
+                    <h4>Steam</h4>
+                    <a href="#" id="steam-link" target="_blank" rel="noopener noreferrer">
+                        <span id="steam-profile">Steam Profile</span>
+                    </a>
+                </div>
+                <button class="admin-only hidden social-edit-btn" data-social="steam" title="Edit">✏️</button>
+            </div>
+            
+            <div class="social-widget reddit-widget">
+                <img src="/assets/icons/reddit-icon.png" alt="Reddit" id="reddit-avatar">
+                <div class="social-info">
+                    <h4>Reddit</h4>
+                    <a href="#" id="reddit-link" target="_blank" rel="noopener noreferrer">
+                        <span id="reddit-profile">Reddit Profile</span>
+                    </a>
+                </div>
+                <button class="admin-only hidden social-edit-btn" data-social="reddit" title="Edit">✏️</button>
+            </div>
+            
+            <div class="social-widget discord-widget">
+                <img src="/assets/icons/discord-icon.png" alt="Discord" id="discord-avatar">
+                <div class="social-info">
+                    <h4>Discord</h4>
+                    <span id="discord-profile">Discord Profile</span>
+                </div>
+                <button class="admin-only hidden social-edit-btn" data-social="discord" title="Edit">✏️</button>
+            </div>
+        </div>
+        
         <div class="customization-controls">
              <button id="theme-toggle" title="Toggle Theme">Toggle Theme</button>
              <div id="background-controls">
@@ -123,15 +294,29 @@
                     </div>
                 </section>
                 
-                <!-- GIF -->
+                <!-- GIF GALLERY WIDGETS -->
                 <section id="gif-section">
-                    <h2>GIF Repository</h2>
-                    <div class="upload-form">
-                        <label for="gif-upload-input" class="custom-file-upload">Choose File</label>
-                        <input type="file" id="gif-upload-input" accept=".gif">
-                        <button id="gif-upload-button" class="upload-btn">Upload GIF</button>
+                    <h2>GIF Gallery</h2>
+                    <div class="gallery-widgets">
+                        <div class="gif-gallery-widget" data-category="sfw">
+                            <div class="widget-cover">
+                                <img src="/assets/gif-covers/sfw-gif-cover.gif" alt="SFW GIF Gallery" class="cover-image">
+                                <div class="widget-overlay">
+                                    <h3>SFW GIFs</h3>
+                                    <p>Safe for work animations</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gif-gallery-widget" data-category="nsfw">
+                            <div class="widget-cover">
+                                <img src="/assets/gif-covers/nsfw-gif-cover.gif" alt="NSFW GIF Gallery" class="cover-image">
+                                <div class="widget-overlay">
+                                    <h3>NSFW GIFs</h3>
+                                    <p>Not safe for work animations</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid-container" id="gif-grid"></div>
                 </section>
 
                 <!-- WRITING -->
@@ -157,27 +342,55 @@
                 
                 <!-- HOMEWORK -->
                 <section id="homework-section">
-                    <h2>Homework Repository</h2>
-                    <div class="upload-form">
-                        <label for="homework-upload-input" class="custom-file-upload">Choose File</label>
-                        <input type="file" id="homework-upload-input">
-                        <button id="homework-upload-button" class="upload-btn">Upload File</button>
+                    <h2>Project Repository</h2>
+                    <div class="homework-summary">
+                        <button id="open-homework-modal" class="glass-button">Browse Projects</button>
+                        <div class="homework-stats">
+                            <span id="homework-count">0 projects uploaded</span>
+                        </div>
                     </div>
-                    <ul id="homework-list" class="file-list"></ul>
                 </section>
             </div>
 
             <aside class="sidebar-column">
-                <section id="youtube-section">
-                    <h3>My Channel <span id="change-url-button" class="admin-only hidden" title="Change URL">✏️</span></h3>
-                    <a href="#" id="youtube-link" target="_blank" rel="noopener noreferrer">Visit my YouTube</a>
-                </section>
-
                 <section id="story-repository">
-                    <h3>Repository of Stories</h3>
+                    <h3>Valerian Sci-fi</h3>
+                    <div class="stories-header">
+                        <button id="view-all-stories" class="glass-button">View All Stories</button>
+                    </div>
                     <div id="story-list"></div>
                 </section>
 
+                <!-- Music Player moved to sidebar -->
+                <section id="music-player-section">
+                    <h3>Music Player</h3>
+                    <div id="music-player">
+                        <audio id="audio-source"></audio>
+                        <div class="player-card">
+                            <img src="placeholder-album-art.jpg" alt="Album Art" id="album-art">
+                            <div class="song-info">
+                                <h4 id="song-title">Select a Song</h4>
+                                <p id="song-artist">from the Playlist</p>
+                            </div>
+                            <div class="progress-container" id="progress-container" title="Seek">
+                                <div class="progress" id="progress"></div>
+                            </div>
+                            <div class="time-stamps">
+                                <span id="current-time">0:00</span>
+                                <span id="duration">0:00</span>
+                            </div>
+                            <div class="controls">
+                                <button id="prev-button" title="Previous">⮜</button>
+                                <button id="play-pause-button" title="Play/Pause">▶️</button>
+                                <button id="next-button" title="Next">⮞</button>
+                            </div>
+                        </div>
+                        <div class="playlist-container">
+                            <button id="playlist-toggle">☰ Playlist</button>
+                            <ul id="playlist" class="hidden"></ul>
+                        </div>
+                    </div>
+                </section>
             </aside>
         </div>
     </main>
@@ -192,4 +405,4 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
 </body>
-</html
+</html>
