@@ -1,97 +1,114 @@
 # Twinship Repository
 
-Welcome to the Twinship Repository, a full-stack personal portfolio and creative media application built with Node.js and MongoDB. This is a pet project made by someone with 0 prior coding knowledge with the aid of AI assistants!
+A comprehensive full-stack personal portfolio and creative media management application built with Node.js, MongoDB, and vanilla JavaScript. This project features a modern glassmorphism design with extensive media handling capabilities, real-time communication, and advanced content management systems.
 
-## Features
+## Table of Contents
+- [Features Overview](#features-overview)
+- [Tech Stack](#tech-stack)
+- [Installation & Setup](#installation--setup)
+- [File Structure](#file-structure)
+- [Feature Documentation](#feature-documentation)
+- [Admin Mode](#admin-mode)
+- [API Endpoints](#api-endpoints)
+- [Deployment](#deployment)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
 
-This app is packed with an array of tools for media handling and content management.
+## Features Overview
 
-### 🎨 Front-End & UI
+### 🎨 Frontend & User Interface
+- **Glassmorphism Design**: Modern "frosted glass" aesthetic with backdrop blur effects
+- **Custom Animated Cursors**: Complete set of custom cursors for different interaction states
+- **Dynamic Theme System**: Persistent light/dark theme toggle with localStorage
+- **Customizable Backgrounds**: User-controlled background selection with SFW/NSFW categories
+- **Toast Notification System**: Custom notifications replacing browser alerts
+- **Responsive Layout**: Adaptive design supporting desktop, tablet, and mobile devices
+- **Smooth Animations**: Lenis smooth scrolling and CSS transitions throughout
+- **Real-time Clock Widget**: System time display with 12-hour format
 
-**Glassmorphism UI**: A modern "frosted glass" aesthetic for all panels and sections, providing a sense of depth and visual appeal.
+### 🖼️ Advanced Gallery System
+- **Dual Gallery Widgets**: Separate SFW and NSFW image galleries with animated covers
+- **GIF Gallery System**: Dedicated GIF management with category support
+- **Interactive Lightbox**: Full-screen image viewing with keyboard navigation
+- **Multiple File Upload**: Batch upload capability for images and GIFs
+- **Category Management**: Admin-controlled content organization
+- **Drag-and-Drop**: Intuitive file upload interface
+- **Image Optimization**: Automatic resizing and format optimization
 
-**Custom Animated Cursors**: A full set of custom animated cursors for different interactions (default, link hover, text input, and loading states).
+### 🎵 Integrated Media Player
+- **Dynamic Music Library**: Automatic detection of music files and cover art
+- **Full Playback Controls**: Play/pause, next/previous, seek functionality
+- **Visual Playlist**: Click-to-play song selection with album art
+- **Progress Tracking**: Real-time playback progress with time display
+- **Automatic Scanning**: Server-side music folder monitoring
+- **Cover Art Support**: Automatic pairing of audio files with cover images
 
-**Light/Dark Theme**: A persistent theme toggle that saves the user's preference across sessions.
+### 📚 Content Management
+- **Story Repository**: "Valerian Sci-fi" collection with file-based story support
+- **Document Management**: Categorized project repository with 5 document types:
+  - Word Documents (.doc, .docx)
+  - PDF Documents (.pdf)
+  - AutoCAD Projects (.dwg)
+  - SolidWorks Files (.sldprt, .sldasm)
+  - PowerPoint Presentations (.ppt, .pptx)
+- **Story Viewer**: Modal-based reading interface with page navigation
+- **Comment System**: User comments on stories with timestamp tracking
+- **Search Functionality**: Real-time story search with content filtering
 
-**Customizable Backgrounds**: A user-facing control panel with two categories (SFW/NSFW) of selectable backgrounds that persist across sessions.
+### 🌐 Social Media Integration
+- **Multi-Platform Support**: YouTube, Steam, Reddit, and Discord integration
+- **Profile Fetching**: Automatic username extraction from profile URLs
+- **Dynamic Updates**: Real-time profile information updates
+- **Clickable Links**: Direct navigation to social media profiles
+- **Fallback System**: Manual profile updates if automatic fetching fails
 
-**Image Lightbox**: Click on any image or GIF in a gallery to view it in a full-screen overlay with arrow key navigation to browse the entire gallery.
+### 💬 Real-time Communication
+- **Live Chat System**: Socket.IO-powered instant messaging
+- **User Presence**: Real-time connection status
+- **Message History**: Persistent chat log during sessions
 
-**Responsive Layout**: A flexible two-column layout that adapts to different screen sizes.
-
-### 🖼️ Gallery System
-
-**SFW/NSFW Gallery Widgets**: Two beautifully designed gallery widgets with hover effects that open into categorized image collections. Each widget features:
-- Animated cover images with overlay text
-- 5x5 responsive grid display (adapts to 3x3 on mobile, 2x2 on small screens)
-- Category-specific upload functionality for admins
-- Full lightbox integration with keyboard navigation
-- Individual delete controls for each image
-
-**Performance-Optimized Display**: Clean, organized gallery presentation with smooth animations and glass morphism styling.
-
-### 🎵 Media & Content
-
-**Image & GIF Repositories**: Separate, dynamically loaded galleries for static images and animated GIFs with full category support.
-
-**Dynamic Music Library**: A full-featured music player that automatically scans a folder for songs and their matching cover art. Includes:
-- Auto-generated playlist from music folder
-- Playback controls (play/pause, next, previous)
-- Seekable progress bar with time display
-- Album art display
-- Click-to-play playlist functionality
-
-**Story Editor & Repository**: An on-page editor to write and save stories, which are then displayed in a scrollable list in the sidebar with preview functionality.
-
-**Homework/File Repository**: A section to upload and list any type of file (PDF, documents, CAD files) for easy access and download.
-
-**Live Chat**: A real-time chatroom powered by Socket.IO for instant communication.
-
-### 🔐 Admin & Back-End
-
-**Admin Mode**: A comprehensive admin mode, activated by a URL query (`?admin=true`), that reveals content management controls including:
-- Upload controls for categorized galleries (SFW/NSFW)
-- Content deletion and management tools
-- Profile customization options
-- Database maintenance tools
-
-**Persistent Database**: All content and settings are saved permanently to a MongoDB Atlas cloud database with category support.
-
-**Content Management**: Admins can:
-- Upload images to specific gallery categories (SFW/NSFW)
-- Delete any image, GIF, story, or homework file
-- Change the profile picture, banner, username, and YouTube link
-- Upload new songs and cover art to the music library
-- Manage categorized content organization
-
-**Database Synchronization**: An admin tool to "Clean Orphaned Entries," which scans the database and removes any records that point to non-existent files.
+### 🔧 Administration Panel
+- **Secure Admin Mode**: URL parameter-based admin access
+- **Content Management**: Upload, delete, and organize all media types
+- **Database Maintenance**: Orphaned file cleanup and synchronization
+- **Profile Customization**: Banner positioning, username changes
+- **Settings Management**: Comprehensive configuration controls
 
 ## Tech Stack
 
-- **Back-End**: Node.js, Express.js
-- **Database**: MongoDB with Mongoose ODM
-- **Real-time Communication**: Socket.IO
-- **Front-End**: Vanilla JavaScript (ES6+), HTML5, CSS3
-- **File Handling**: Multer with category support
-- **UI Interactions**: SortableJS
-- **Smooth Scrolling**: Lenis
+### Backend
+- **Node.js**: JavaScript runtime environment
+- **Express.js**: Web application framework
+- **MongoDB Atlas**: Cloud database with Mongoose ODM
+- **Socket.IO**: Real-time bidirectional event-based communication
+- **Multer**: Middleware for file upload handling
+- **dotenv**: Environment variable management
 
-## Setup and Installation
+### Frontend
+- **Vanilla JavaScript (ES6+)**: Modern JavaScript without frameworks
+- **HTML5**: Semantic markup structure
+- **CSS3**: Advanced styling with custom properties and animations
+- **Lenis**: Smooth scrolling library
+- **SortableJS**: Drag and drop functionality
 
-To run this project locally, follow these steps:
+### External Services
+- **MongoDB Atlas**: Database hosting and management
+- **Render/Vercel**: Deployment platforms
+- **CDNJS**: External library hosting
+
+## Installation & Setup
 
 ### Prerequisites
-- Node.js installed
+- Node.js (v14 or higher)
 - MongoDB Atlas account (free tier available)
-- Git installed
+- Git version control
 
-### Installation Steps
+### Local Development Setup
 
-1. **Clone the Repository**
+1. **Clone Repository**
 ```bash
-git clone https://github.com/YourUsername/YourRepositoryName.git
-cd YourRepositoryName
+git clone <repository-url>
+cd twinship-repository
 ```
 
 2. **Install Dependencies**
@@ -99,110 +116,408 @@ cd YourRepositoryName
 npm install
 ```
 
-3. **Set Up Environment Variables**
-   - Create a file named `.env` in the root of the project
-   - Get your connection string from your MongoDB Atlas cluster
-   - Add the connection string to your `.env` file (replace with your actual database user password):
-
+3. **Environment Configuration**
+Create `.env` file in project root:
 ```env
-DATABASE_URL=mongodb+srv://YourUser:YourPassword@cluster0.xxxxx.mongodb.net/yourDatabaseName?retryWrites=true&w=majority
+DATABASE_URL=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/<database>?retryWrites=true&w=majority
+PORT=3000
 ```
 
-4. **Set Up Asset Directories**
-   - Create the following directory structure in `/public/assets/`:
-     - `/backgrounds/sfw/` - Add your SFW background images
-     - `/backgrounds/nsfw/` - Add your NSFW background images  
-     - `/gallery-covers/` - Add `sfw-cover.jpg` and `nsfw-cover.jpg` for gallery widget covers
-     - `/music/` - Add your music files (.mp3) and matching cover art (.jpg/.png)
+4. **Directory Structure Creation**
+The server automatically creates required directories:
+```
+public/
+├── assets/
+│   ├── backgrounds/
+│   │   ├── sfw/         # SFW background images
+│   │   └── nsfw/        # NSFW background images
+│   ├── gallery-covers/  # Gallery widget cover images
+│   ├── gif-covers/      # GIF gallery covers
+│   ├── icons/           # Social media and document icons
+│   ├── music/           # Music files and cover art
+│   └── cursors/         # Custom cursor files
+└── uploads/             # User-uploaded content
+```
 
-5. **Run the Server**
+5. **Asset Setup**
+Add your assets to the appropriate directories:
+- **Backgrounds**: Add background images to `/public/assets/backgrounds/sfw/` and `/public/assets/backgrounds/nsfw/`
+- **Music**: Place `.mp3` files and matching cover art in `/public/assets/music/`
+- **Icons**: Add platform icons to `/public/assets/icons/`
+- **Cursors**: Place cursor files in `/public/assets/cursors/`
+
+6. **Start Development Server**
 ```bash
 node server.js
 ```
 
-The application will be running at `http://localhost:3000`.
+7. **Access Application**
+- User Mode: `http://localhost:3000`
+- Admin Mode: `http://localhost:3000?admin=true`
 
 ## File Structure
 
 ```
-/my-portfolio-app
-│
-├── /public
-│   ├── /assets
-│   │   ├── /backgrounds
-│   │   │   ├── /sfw
-│   │   │   └── /nsfw
-│   │   ├── /gallery-covers
-│   │   ├── /cursors
-│   │   └── /music
-│   ├── /uploads
-│   ├── styles.css
-│   └── script.js
-├── .env                    # Your local secrets (not in repo)
-├── .gitignore
-├── index.html
-├── package.json
-├── package-lock.json
-├── README.md
-└── server.js
+twinship-repository/
+├── public/                    # Static assets
+│   ├── assets/               # Media assets
+│   │   ├── backgrounds/      # Background images
+│   │   ├── cursors/          # Custom cursors
+│   │   ├── gallery-covers/   # Gallery thumbnails
+│   │   ├── gif-covers/       # GIF gallery covers
+│   │   ├── icons/            # Platform icons
+│   │   └── music/            # Music library
+│   ├── uploads/              # User uploads
+│   ├── styles.css           # Main stylesheet
+│   └── script.js            # Frontend JavaScript
+├── .env                      # Environment variables
+├── .gitignore               # Git ignore rules
+├── index.html               # Main HTML file
+├── package.json             # Node.js dependencies
+├── server.js                # Express server
+└── README.md                # This file
 ```
 
-## Usage
+## Feature Documentation
 
-### Admin Mode
-To access the content management features, add `?admin=true` to the end of the URL.
+### Gallery System
 
-**Example**: `http://localhost:3000?admin=true`
+#### Image Galleries
+- **SFW Gallery**: Safe-for-work image collection
+- **NSFW Gallery**: Adult content with restricted access
+- **Upload Process**: Drag-and-drop or file selection
+- **Batch Upload**: Multiple file selection support
+- **Management**: Admin deletion and organization tools
 
-This will reveal:
-- Admin tools panel
-- Upload controls for galleries
-- Edit icons and delete/drag handles on content
-- Category-specific gallery management
+#### GIF Management
+- **Separate GIF Galleries**: Independent SFW/NSFW GIF collections
+- **Animated Covers**: GIF preview thumbnails
+- **Category Support**: Organized content management
 
-### Gallery Management
-- **SFW Gallery**: Click the SFW widget to manage safe-for-work images
-- **NSFW Gallery**: Click the NSFW widget to manage adult content
-- **Upload**: Use the upload controls within each gallery modal (admin only)
-- **Navigation**: Use arrow keys or on-screen controls in lightbox mode
+### Music Player
+
+#### Setup Instructions
+1. Create music directory: `/public/assets/music/`
+2. Add MP3 files to the directory
+3. Add matching cover art with identical filename:
+   - `song.mp3` → `song.jpg` or `song.png`
+4. Restart server to scan for new files
+
+#### Player Features
+- **Automatic Detection**: Server scans music folder on startup
+- **Playlist Generation**: Dynamic playlist creation
+- **Playback Controls**: Full media control interface
+- **Progress Tracking**: Visual progress bar with time display
+- **Click-to-Play**: Direct song selection from playlist
+
+### Document Repository
+
+#### Supported Categories
+1. **Word Documents**: .doc, .docx files
+2. **PDF Documents**: .pdf files
+3. **AutoCAD Projects**: .dwg files
+4. **SolidWorks**: .sldprt, .sldasm files
+5. **PowerPoint**: .ppt, .pptx files
+
+#### Usage
+- Click "Browse Projects" to open repository
+- Select category widget to view files
+- Download files directly from browser
+- Admin can upload/delete files by category
+
+### Social Media Integration
+
+#### Supported Platforms
+- **YouTube**: Channel URLs and usernames
+- **Steam**: Community profile URLs
+- **Reddit**: User profile URLs
+- **Discord**: Username display only
+
+#### Configuration
+1. Enter admin mode (`?admin=true`)
+2. Click pencil icon next to social widget
+3. Enter profile URL or username
+4. System attempts automatic profile fetching
+5. Manual fallback if automatic fetch fails
+
+### Story Management
+
+#### Story Repository
+- **"Valerian Sci-fi" Collection**: Themed story repository
+- **File Support**: Upload PDF and DOCX story files
+- **Text Stories**: Direct text entry through web interface
+- **Preview System**: Story previews in sidebar
+- **Search Functionality**: Real-time story filtering
+
+#### Story Viewer
+- **Modal Interface**: Full-screen reading experience
+- **Page Navigation**: Next/previous page controls
+- **Comment System**: User feedback on stories
+- **Responsive Design**: Mobile-optimized reading
+
+### Real-time Features
+
+#### Live Chat
+- **Socket.IO Integration**: Instant message delivery
+- **User Sessions**: Persistent chat during visit
+- **Message History**: Session-based message storage
+
+#### Toast Notifications
+- **Custom System**: Replaces browser alerts
+- **Multiple Types**: Success, error, warning, info
+- **Auto-dismiss**: Timed automatic removal
+- **Manual Close**: User-controlled dismissal
+
+## Admin Mode
+
+### Activation
+Add `?admin=true` to any URL to enable admin mode.
+
+### Admin Capabilities
+
+#### Content Management
+- **Upload Controls**: Batch file uploads across all categories
+- **Delete Operations**: Remove any content type
+- **Category Management**: Organize content by type
+- **Reorder Content**: Drag-and-drop content organization
+
+#### Profile Customization
+- **Username Changes**: Real-time profile updates
+- **Profile Pictures**: Upload and crop profile images
+- **Banner Management**: Upload and position banner images
+- **Banner Positioning**: Drag-to-position banner images
+- **Social Media**: Configure all platform connections
+
+#### System Maintenance
+- **Database Cleanup**: Remove orphaned database entries
+- **File Synchronization**: Sync database with file system
+- **Cache Management**: Clear system caches
+- **Error Monitoring**: View system error logs
+
+#### Admin Tools Panel
+- **Floating Action Button**: Quick access to admin functions
+- **Clean Database**: Remove orphaned entries
+- **Remove Banner**: Clear banner image
+- **Exit Admin Mode**: Return to user view
+
+## API Endpoints
+
+### Content Management
+```
+POST /upload              # Single file upload
+POST /upload-multiple     # Multiple file upload
+DELETE /api/media         # Delete media files
+GET /api/data            # Retrieve all application data
+```
+
+### Gallery Operations
+```
+GET /api/gallery/:category    # Get gallery by category (sfw/nsfw)
+GET /api/gifs/:category      # Get GIFs by category
+POST /api/gallery/reorder    # Reorder gallery items
+```
+
+### Document Management
+```
+GET /api/homework/:category  # Get documents by category
+```
+
+### Story Management
+```
+GET /api/stories/all        # Get all stories
+GET /api/story/:id          # Get specific story
+POST /api/stories           # Create new story
+DELETE /api/stories/:id     # Delete story
+```
+
+### Comments
+```
+GET /api/comments/:storyId   # Get story comments
+POST /api/comments           # Add comment
+```
 
 ### Music Library
-To add songs to the library, place your `.mp3` files and their corresponding `.jpg` or `.png` cover art (with the exact same filename) into the `/public/assets/music` folder. The server will automatically detect them on the next page load.
+```
+GET /api/music              # Get music library
+```
+
+### Social Media
+```
+POST /api/fetch-social-profile  # Fetch social media profile
+```
+
+### Settings & Configuration
+```
+POST /api/settings             # Update user settings
+POST /api/banner-position      # Update banner position
+POST /api/remove-banner        # Remove banner image
+POST /api/sync-database        # Database maintenance
+```
 
 ## Deployment
 
-This application is ready for deployment on services like Render, Vercel, or similar platforms.
-
 ### Render Deployment
-1. Push the final code to a GitHub repository
-2. Create a new "Web Service" on Render and connect it to your repository
-3. Use the following settings:
-   - **Build Command**: `npm install`
-   - **Start Command**: `node server.js`
-4. In the "Environment" tab, add a secret environment variable:
-   - **Key**: `DATABASE_URL`
-   - **Value**: Your full MongoDB Atlas connection string
 
-Render will automatically deploy the application on every push to your main branch.
+1. **Repository Setup**
+   - Push code to GitHub repository
+   - Ensure all sensitive data is in `.env` file
 
-## Credits
+2. **Render Configuration**
+   - Create new "Web Service" on Render
+   - Connect to GitHub repository
+   - Build Command: `npm install`
+   - Start Command: `node server.js`
 
-**Development Assistance**: This project was built with the help of multiple AI assistants:
-- **Claude Sonnet 4** (Anthropic) - Major feature development and code architecture
-- **ChatGPT** (OpenAI) - Initial development assistance  
-- **Gemini Pro 2.5** (Google) - Early development and problem-solving
+3. **Environment Variables**
+   Add to Render environment:
+   ```
+   DATABASE_URL=<your-mongodb-atlas-connection-string>
+   ```
 
-**Assets**:
-- **Cursors**: Credit to the artists of the cursor files used
-- **Music**: Credit to the artists of the music files used  
-- **Images**: Credit to the artists of the background images used
+4. **Asset Management**
+   - Upload assets through admin interface post-deployment
+   - Or include in repository before deployment
 
-**Special Thanks**: To the open-source community for the libraries and tools that made this project possible.
+### Vercel Deployment
+
+1. **Install Vercel CLI**
+```bash
+npm i -g vercel
+```
+
+2. **Deploy**
+```bash
+vercel --prod
+```
+
+3. **Environment Variables**
+Configure through Vercel dashboard or CLI
+
+### Environment Variables
+```env
+DATABASE_URL=mongodb+srv://<user>:<password>@cluster.mongodb.net/<database>
+PORT=3000
+NODE_ENV=production
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### Music Player Not Working
+- **Check File Format**: Ensure MP3 format
+- **Verify Cover Art**: Matching filenames required
+- **Console Errors**: Check browser console for audio errors
+- **File Permissions**: Ensure server can read music directory
+
+#### Upload Failures
+- **File Size**: Check file size limits (50MB default)
+- **Timeout Issues**: Increase timeout for large files
+- **Network Connectivity**: Verify stable internet connection
+- **Database Connection**: Check MongoDB Atlas connection
+
+#### Social Media Integration
+- **URL Format**: Ensure proper platform URL format
+- **API Limits**: Some platforms have rate limiting
+- **CORS Issues**: Check cross-origin request policies
+- **Authentication**: Some platforms require authentication
+
+#### Database Issues
+- **Connection String**: Verify MongoDB Atlas connection
+- **Network Access**: Check MongoDB Atlas network settings
+- **Database Permissions**: Ensure proper user permissions
+- **Orphaned Files**: Use admin cleanup tools
+
+### Performance Optimization
+
+#### File Management
+- **Image Compression**: Optimize images before upload
+- **File Organization**: Regular cleanup of unused files
+- **Database Indexing**: Monitor database performance
+- **Caching Strategy**: Implement browser caching
+
+#### Network Performance
+- **CDN Usage**: Consider CDN for static assets
+- **Gzip Compression**: Enable server compression
+- **Minification**: Minify CSS and JavaScript
+- **Lazy Loading**: Implement progressive loading
+
+## Security Considerations
+
+### Admin Access
+- **URL Parameter Security**: Admin mode is URL-based (consider authentication upgrade)
+- **File Upload Validation**: Server-side file type validation
+- **Input Sanitization**: All user inputs are sanitized
+- **Database Security**: MongoDB Atlas provides built-in security
+
+### Recommended Enhancements
+- **Authentication System**: Implement proper admin login
+- **HTTPS Enforcement**: Use SSL certificates
+- **Rate Limiting**: Implement request rate limiting
+- **Content Security Policy**: Add CSP headers
 
 ## Contributing
 
-This is a personal portfolio project, but feel free to fork it and adapt it for your own use. If you find bugs or have suggestions for improvements, please open an issue.
+### Development Guidelines
+1. Follow existing code style and structure
+2. Test all features thoroughly before submission
+3. Update documentation for new features
+4. Use meaningful commit messages
+5. Consider backward compatibility
+
+### Feature Requests
+- Open GitHub issues for feature requests
+- Provide detailed use case descriptions
+- Consider implementation complexity
+- Test proposed solutions
+
+### Bug Reports
+- Include browser and system information
+- Provide reproduction steps
+- Include console error messages
+- Attach relevant screenshots
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+MIT License - See LICENSE file for details.
+
+## Credits
+
+### Development
+- **Primary Assistant**: Claude Sonnet 4 (Anthropic) - Major feature development and architecture
+- **Additional Support**: ChatGPT (OpenAI), Gemini Pro 2.5 (Google)
+- **Human Developer**: Project conception and requirements
+
+### Assets
+- **Custom Cursors**: Community-contributed cursor designs
+- **Background Images**: User-provided background collection
+- **Music Library**: User-provided audio content
+- **Icons**: Platform-specific iconography
+
+### Open Source Libraries
+- **Node.js & Express**: Server framework
+- **MongoDB & Mongoose**: Database management
+- **Socket.IO**: Real-time communication
+- **Lenis**: Smooth scrolling
+- **SortableJS**: Drag and drop functionality
+
+## Support
+
+For technical support or questions:
+1. Check troubleshooting section above
+2. Review GitHub issues for similar problems
+3. Create new issue with detailed description
+4. Include system information and error messages
+
+## Version History
+
+- **v1.0.0**: Initial release with basic functionality
+- **v1.1.0**: Added music player and GIF galleries
+- **v1.2.0**: Implemented social media integration
+- **v1.3.0**: Enhanced document repository system
+- **v1.4.0**: Added real-time chat and comments
+- **v2.0.0**: Complete UI overhaul with glassmorphism design
+
+---
+
+**Note**: This project represents a learning journey from zero coding knowledge to a full-stack application, demonstrating the potential of AI-assisted development while maintaining focus on functionality and user experience.
