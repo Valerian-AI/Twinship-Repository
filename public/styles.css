@@ -17,6 +17,84 @@
     --info-color: #17a2b8;
 }
 
+/* --- Neuro Sama Aspect Colors --- */
+body.neuro-aspect {
+    --accent-color: #8DEDEB;
+    --glass-bg-light: rgba(141, 237, 235, 0.3);
+    --glass-bg-dark: rgba(141, 237, 235, 0.15);
+    --glass-button-hover: rgba(210, 179, 153, 0.6);
+    --glass-button-hover-dark: rgba(210, 179, 153, 0.4);
+    --primary-text-light: #150204;
+    --primary-text-dark: #F6DAC7;
+    --border-color-light: rgba(252, 129, 172, 0.3);
+    --border-color-dark: rgba(252, 129, 172, 0.2);
+    --shadow-color: rgba(142, 238, 234, 0.2);
+    --dark-shadow-color: rgba(142, 238, 234, 0.3);
+}
+
+body.neuro-aspect .progress {
+    background: linear-gradient(90deg, #FC81AC, #8EEEEA);
+}
+
+body.neuro-aspect #admin-fab {
+    background: linear-gradient(135deg, #8DEDEB, #FC81AC);
+}
+
+body.neuro-aspect .toast-success .toast-content::before {
+    color: #8EEEEA;
+}
+
+body.neuro-aspect .toast-error .toast-content::before {
+    color: #FC81AC;
+}
+
+body.neuro-aspect .toast-warning .toast-content::before {
+    color: #D2B399;
+}
+
+body.neuro-aspect .toast-info .toast-content::before {
+    color: #8DEDEB;
+}
+
+/* --- Evil Neuro Sama Aspect Colors --- */
+body.evil-neuro-aspect {
+    --accent-color: #E7205B;
+    --glass-bg-light: rgba(231, 32, 91, 0.2);
+    --glass-bg-dark: rgba(231, 32, 91, 0.1);
+    --glass-button-hover: rgba(120, 11, 52, 0.6);
+    --glass-button-hover-dark: rgba(120, 11, 52, 0.4);
+    --primary-text-light: #F6DAC7;
+    --primary-text-dark: #A67F75;
+    --border-color-light: rgba(21, 2, 4, 0.4);
+    --border-color-dark: rgba(58, 58, 59, 0.3);
+    --shadow-color: rgba(21, 2, 4, 0.3);
+    --dark-shadow-color: rgba(21, 2, 4, 0.5);
+}
+
+body.evil-neuro-aspect .progress {
+    background: linear-gradient(90deg, #780B34, #150204);
+}
+
+body.evil-neuro-aspect #admin-fab {
+    background: linear-gradient(135deg, #E7205B, #780B34);
+}
+
+body.evil-neuro-aspect .toast-success .toast-content::before {
+    color: #A67F75;
+}
+
+body.evil-neuro-aspect .toast-error .toast-content::before {
+    color: #E7205B;
+}
+
+body.evil-neuro-aspect .toast-warning .toast-content::before {
+    color: #780B34;
+}
+
+body.evil-neuro-aspect .toast-info .toast-content::before {
+    color: #3A3A3B;
+}
+
 /* --- Custom Cursor Styles --- */
 html, body {
     cursor: url('/assets/normalpointer.gif') 0 0, auto;
@@ -534,6 +612,14 @@ body.dark-theme .homework-upload-section {
     transform: translateY(-2px);
 }
 
+body.neuro-aspect .story-nav-btn:hover {
+    background: #FC81AC;
+}
+
+body.evil-neuro-aspect .story-nav-btn:hover {
+    background: #780B34;
+}
+
 .story-nav-btn:disabled {
     background: #6c757d;
     cursor: not-allowed;
@@ -931,6 +1017,51 @@ body.dark-theme .story-item:hover {
     z-index: 25; 
     padding: 8px 12px; 
     border-radius: 30px; 
+}
+
+#theme-toggle,
+#aspect-toggle {
+    background: var(--glass-bg-light);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 8px 16px;
+    color: var(--primary-text-light);
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+body.dark-theme #theme-toggle,
+body.dark-theme #aspect-toggle {
+    background: var(--glass-bg-dark);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--primary-text-dark);
+}
+
+#theme-toggle:hover,
+#aspect-toggle:hover {
+    background: var(--glass-button-hover);
+    transform: translateY(-2px);
+}
+
+body.dark-theme #theme-toggle:hover,
+body.dark-theme #aspect-toggle:hover {
+    background: var(--glass-button-hover-dark);
+}
+
+/* Aspect Toggle Indicator Colors */
+body.neuro-aspect #aspect-toggle {
+    background: linear-gradient(135deg, rgba(141, 237, 235, 0.3), rgba(252, 129, 172, 0.3));
+    border-color: rgba(142, 238, 234, 0.4);
+    color: var(--primary-text-light);
+}
+
+body.evil-neuro-aspect #aspect-toggle {
+    background: linear-gradient(135deg, rgba(231, 32, 91, 0.3), rgba(120, 11, 52, 0.3));
+    border-color: rgba(231, 32, 91, 0.4);
+    color: var(--primary-text-light);
 }
 
 #background-controls { 
@@ -1586,6 +1717,14 @@ button:hover {
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
+body.neuro-aspect button:hover {
+    background: #FC81AC;
+}
+
+body.evil-neuro-aspect button:hover {
+    background: #780B34;
+}
+
 button:active {
     transform: translateY(0);
 }
@@ -1684,6 +1823,14 @@ body.dark-theme .file-list li:hover {
     color: #0056b3;
 }
 
+body.neuro-aspect .file-list li a:hover {
+    color: #FC81AC;
+}
+
+body.evil-neuro-aspect .file-list li a:hover {
+    color: #780B34;
+}
+
 /* --- Credits Footer --- */
 #credits-footer { 
     max-width: 1400px; 
@@ -1718,95 +1865,15 @@ body.dark-theme .file-list li:hover {
     color: #0056b3;
 }
 
-/* --- Responsive Design --- */
-@media (max-width: 768px) {
-    .main-layout {
-        flex-direction: column;
-    }
-    
-    .content-column,
-    .sidebar-column {
-        min-width: unset;
-    }
-    
-    .gallery-widgets {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .gallery-widget,
-    .gif-gallery-widget,
-    .homework-widget {
-        width: 100%;
-        max-width: 300px;
-    }
-    
-    .gallery-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .homework-categories {
-        grid-template-columns: 1fr;
-    }
-    
-    .social-widgets {
-        position: relative;
-        bottom: unset;
-        left: unset;
-        transform: none;
-        margin-top: 20px;
-        flex-wrap: wrap;
-    }
-    
-    .social-widget {
-        min-width: unset;
-        flex: 1;
-        min-width: 160px;
-    }
-    
-    #profile-header {
-        margin-bottom: 40px;
-    }
-    
-    .customization-controls {
-        position: relative;
-        top: unset;
-        right: unset;
-        margin-top: 15px;
-        justify-content: center;
-    }
-    
-    .clock-widget {
-        position: relative;
-        top: unset;
-        left: unset;
-        margin-bottom: 15px;
-    }
-    
-    /* Music player stays in sidebar on mobile */
-    #music-player-section {
-        order: 2; /* Ensure it comes after story section */
-    }
-    
-    .stories-header {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .stories-search {
-        max-width: unset;
-    }
-    
-    .story-header {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .story-navigation {
-        order: 2;
-    }
+body.neuro-aspect #credits-footer a:hover {
+    color: #FC81AC;
 }
 
+body.evil-neuro-aspect #credits-footer a:hover {
+    color: #780B34;
+}
+
+/* --- Responsive Design --- */
 @media (max-width: 480px) {
     main {
         padding: 15px;
@@ -1871,6 +1938,11 @@ body.dark-theme .file-list li:hover {
         left: 20px;
         right: 20px;
     }
+    
+    .customization-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
 }
 
 /* --- Animation Classes --- */
@@ -1929,6 +2001,24 @@ body.dark-theme ::-webkit-scrollbar-thumb:hover {
     background: rgba(255,255,255,0.3);
 }
 
+/* Neuro Sama aspect scrollbar */
+body.neuro-aspect ::-webkit-scrollbar-thumb {
+    background: rgba(141, 237, 235, 0.4);
+}
+
+body.neuro-aspect ::-webkit-scrollbar-thumb:hover {
+    background: rgba(252, 129, 172, 0.6);
+}
+
+/* Evil Neuro Sama aspect scrollbar */
+body.evil-neuro-aspect ::-webkit-scrollbar-thumb {
+    background: rgba(231, 32, 91, 0.4);
+}
+
+body.evil-neuro-aspect ::-webkit-scrollbar-thumb:hover {
+    background: rgba(120, 11, 52, 0.6);
+}
+
 /* --- Loading States --- */
 .loading {
     position: relative;
@@ -1948,6 +2038,14 @@ body.dark-theme ::-webkit-scrollbar-thumb:hover {
 
 body.dark-theme .loading::after {
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+}
+
+body.neuro-aspect .loading::after {
+    background: linear-gradient(90deg, transparent, rgba(141, 237, 235, 0.3), transparent);
+}
+
+body.evil-neuro-aspect .loading::after {
+    background: linear-gradient(90deg, transparent, rgba(231, 32, 91, 0.2), transparent);
 }
 
 @keyframes shimmer {
@@ -2002,6 +2100,37 @@ audio#audio-source {
     display: none !important;
 }
 
+/* --- Aspect-specific additional styling --- */
+/* Neuro Sama gradient overlays */
+body.neuro-aspect .widget-overlay {
+    background: linear-gradient(transparent, rgba(141, 237, 235, 0.8));
+}
+
+body.neuro-aspect .gallery-widget:hover,
+body.neuro-aspect .gif-gallery-widget:hover,
+body.neuro-aspect .homework-widget:hover {
+    box-shadow: 0 12px 25px rgba(142, 238, 234, 0.4);
+}
+
+body.neuro-aspect #background-categories button.active {
+    background: linear-gradient(135deg, #8DEDEB, #FC81AC);
+}
+
+/* Evil Neuro Sama gradient overlays */
+body.evil-neuro-aspect .widget-overlay {
+    background: linear-gradient(transparent, rgba(120, 11, 52, 0.8));
+}
+
+body.evil-neuro-aspect .gallery-widget:hover,
+body.evil-neuro-aspect .gif-gallery-widget:hover,
+body.evil-neuro-aspect .homework-widget:hover {
+    box-shadow: 0 12px 25px rgba(21, 2, 4, 0.6);
+}
+
+body.evil-neuro-aspect #background-categories button.active {
+    background: linear-gradient(135deg, #E7205B, #780B34);
+}
+
 /* --- Print Styles --- */
 @media print {
     .admin-only,
@@ -2009,7 +2138,9 @@ audio#audio-source {
     #admin-tools,
     .customization-controls,
     .social-edit-btn,
-    .delete-button {
+    .delete-button,
+    #aspect-toggle,
+    #theme-toggle {
         display: none !important;
     }
     
@@ -2018,10 +2149,156 @@ audio#audio-source {
         color: black !important;
     }
     
+    body.neuro-aspect,
+    body.evil-neuro-aspect {
+        --primary-text-light: #000 !important;
+        --primary-text-dark: #000 !important;
+    }
+    
     section,
     aside section {
         background: white !important;
         border: 1px solid #ccc !important;
         box-shadow: none !important;
     }
+}
+
+/* --- Enhanced Focus Indicators for Aspect Themes --- */
+body.neuro-aspect button:focus,
+body.neuro-aspect input:focus,
+body.neuro-aspect textarea:focus,
+body.neuro-aspect select:focus {
+    outline-color: #FC81AC;
+    box-shadow: 0 0 0 3px rgba(252, 129, 172, 0.2);
+}
+
+body.evil-neuro-aspect button:focus,
+body.evil-neuro-aspect input:focus,
+body.evil-neuro-aspect textarea:focus,
+body.evil-neuro-aspect select:focus {
+    outline-color: #E7205B;
+    box-shadow: 0 0 0 3px rgba(231, 32, 91, 0.2);
+}
+
+/* --- Smooth aspect transitions --- */
+body {
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+body * {
+    transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Fixed media query */
+@media (max-width: 768px) {
+    .main-layout {
+        flex-direction: column; /* stack layout on small screens */
+    }
+}
+
+.content-column,
+.sidebar-column {
+    min-width: unset;
+}
+
+/* Default: side by side */
+.gallery-widgets {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: 20px;
+}
+
+.gallery-widget,
+.gif-gallery-widget,
+.homework-widget {
+    flex: 1 1 300px;   /* flexible width, min 300px */
+    max-width: 400px;  /* optional upper limit */
+}
+
+/* On mobile: stack */
+@media (max-width: 768px) {
+    .gallery-widgets {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .gallery-widget,
+    .gif-gallery-widget,
+    .homework-widget {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+.gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.homework-categories {
+    grid-template-columns: 1fr;
+}
+
+.social-widgets {
+    position: relative;
+    bottom: unset;
+    left: unset;
+    transform: none;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.social-widget {
+    min-width: unset;
+    flex: 1;
+    min-width: 160px;
+}
+
+#profile-header {
+    margin-bottom: 40px;
+}
+
+.clock-widget {
+    position: relative;
+    top: unset;
+    left: unset;
+    margin-bottom: 15px;
+}
+
+.customization-controls {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.customization-controls button {
+    padding: 8px 14px;
+    border-radius: 8px;
+}
+
+
+/* Music player stays in sidebar on mobile */
+#music-player-section {
+    order: 2; /* Ensure it comes after story section */
+}
+
+.stories-header {
+    flex-direction: column;
+    gap: 15px;
+}
+
+.stories-search {
+    max-width: unset;
+}
+
+.story-header {
+    flex-direction: column;
+    text-align: center;
+}
+
+.story-navigation {
+    order: 2;
 }

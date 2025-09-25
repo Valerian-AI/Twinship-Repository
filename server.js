@@ -59,7 +59,6 @@ const SettingsSchema = new mongoose.Schema({
     bannerPosition: { type: String, default: 'center center' },
     youtubeUrl: { type: String, default: 'https://www.youtube.com' },
     steamProfile: { type: String, default: '' },
-    redditProfile: { type: String, default: '' },
     discordProfile: { type: String, default: '' }
 });
 
@@ -444,7 +443,7 @@ app.delete('/api/stories/:id', async (req, res) => {
 app.post('/api/settings', async (req, res) => { 
     try {
         const updateData = {};
-        const allowedFields = ['username', 'youtubeUrl', 'steamProfile', 'redditProfile', 'discordProfile'];
+        const allowedFields = ['username', 'youtubeUrl', 'steamProfile', 'discordProfile'];
         
         Object.keys(req.body).forEach(key => {
             if (allowedFields.includes(key)) {
@@ -536,13 +535,6 @@ app.post('/api/fetch-social-profile', async (req, res) => {
                     profileData.avatar = '/assets/icons/steam-icon.png';
                 }
                 break;
-            case 'reddit':
-                if (url.includes('reddit.com')) {
-                    const userMatch = url.match(/\/u(?:ser)?\/([^\/\?]+)/);
-                    profileData.name = userMatch ? `u/${userMatch[1]}` : 'Reddit User';
-                    profileData.avatar = '/assets/icons/reddit-icon.png';
-                }
-                break;
             case 'discord':
                 // Discord doesn't have public profile URLs, so we'll use the provided name
                 profileData.name = url || 'Discord User';
@@ -577,7 +569,6 @@ const createIconsDirectory = () => {
         const placeholderIcons = [
             'youtube-icon.png',
             'steam-icon.png', 
-            'reddit-icon.png',
             'discord-icon.png',
             'word-icon.png',
             'pdf-icon.png',

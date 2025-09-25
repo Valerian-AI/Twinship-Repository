@@ -42,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
         banner: document.getElementById('banner-display'),
         youtubeLink: document.getElementById('youtube-link'),
         steamProfile: document.getElementById('steam-profile'),
-        redditProfile: document.getElementById('reddit-profile'),
         discordProfile: document.getElementById('discord-profile'),
         lightbox: document.getElementById('lightbox'),
         lightboxImage: document.querySelector('.lightbox-content'),
@@ -67,6 +66,40 @@ document.addEventListener('DOMContentLoaded', () => {
         storyList: document.getElementById('story-list'),
         homeworkCount: document.getElementById('homework-count')
     };
+
+    // Aspect Toggle functionality
+    const aspectColors = {
+        neuro: {
+            primary: '#8DEDEB',
+            secondary: '#D2B399',
+            accent: '#FC81AC',
+            tertiary: '#8EEEEA',
+            quaternary: '#F6DAC7'
+        },
+        evilNeuro: {
+            primary: '#E7205B',
+            secondary: '#780B34',
+            accent: '#150204',
+            tertiary: '#3A3A3B',
+            quaternary: '#A67F75'
+        }
+    };
+
+    function setAspect(aspect) {
+        document.body.classList.remove('neuro-aspect', 'evil-neuro-aspect');
+        if (aspect === 'neuro') {
+            document.body.classList.add('neuro-aspect');
+        } else if (aspect === 'evilNeuro') {
+            document.body.classList.add('evil-neuro-aspect');
+        }
+        localStorage.setItem('aspect', aspect);
+    }
+
+    // Initialize aspect from localStorage
+    const savedAspect = localStorage.getItem('aspect') || 'default';
+    if (savedAspect !== 'default') {
+        setAspect(savedAspect);
+    }
 
     // Toast notification system
     function showToast(message, type = 'info') {
@@ -230,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Social media profile fetcher
+    // Social media profile fetcher - Updated to exclude reddit
     async function fetchSocialProfile(platform, url) {
         try {
             const response = await fetch('/api/fetch-social-profile', {
@@ -249,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Update social media widget
+    // Update social media widget - Updated to exclude reddit
     function updateSocialWidget(platform, profile) {
         const nameElement = document.getElementById(`${platform}-profile`);
         const linkElement = document.getElementById(`${platform}-link`);
@@ -459,60 +492,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const modal = document.getElementById('homework-modal');
         if (modal) {
             modal.classList.add('hidden');
-        }
-    }
-
-    // Social media profile fetcher - Fixed implementation
-    async function fetchSocialProfile(platform, url) {
-        try {
-            const response = await fetch('/api/fetch-social-profile', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ platform, url })
-            });
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText);
-            }
-            
-            const data = await response.json();
-            
-            if (data.success && data.profile) {
-                return data.profile;
-            } else {
-                throw new Error('Profile fetch failed');
-            }
-        } catch (error) {
-            console.error('Profile fetch error:', error);
-            showToast(`Failed to fetch ${platform} profile: ${error.message}`, 'error');
-            return null;
-        }
-    }
-
-    // Update social media widget - Fixed implementation
-    function updateSocialWidget(platform, profile) {
-        const nameElement = document.getElementById(`${platform}-profile`);
-        const linkElement = document.getElementById(`${platform}-link`);
-        const avatarElement = document.getElementById(`${platform}-avatar`);
-        
-        console.log(`Updating ${platform} widget:`, profile);
-        
-        if (nameElement) {
-            nameElement.textContent = profile.name || `${platform} Profile`;
-        }
-        
-        if (linkElement && profile.url && profile.url !== '#') {
-            linkElement.href = profile.url;
-            linkElement.target = '_blank';
-            linkElement.rel = 'noopener noreferrer';
-        }
-        
-        if (avatarElement && profile.avatar) {
-            avatarElement.src = profile.avatar;
-            avatarElement.onerror = () => {
-                avatarElement.src = `/assets/icons/${platform}-icon.png`;
-            };
         }
     }
 
@@ -814,21 +793,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Homework modal functions
-    function openHomeworkModal() {
-        const modal = document.getElementById('homework-modal');
-        if (modal) {
-            modal.classList.remove('hidden');
-        }
-    }
-
-    function closeHomeworkModal() {
-        const modal = document.getElementById('homework-modal');
-        if (modal) {
-            modal.classList.add('hidden');
-        }
-    }
-
     // Stories list modal functions
     function openStoriesListModal() {
         const modal = document.getElementById('stories-list-modal');
@@ -947,7 +911,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initialize page data with social media loading
+    // Initialize page data with social media loading - Updated to exclude reddit
     async function initializePage() {
         if (isAdmin) {
             document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
@@ -967,8 +931,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 elements.banner.style.backgroundPosition = data.settings.bannerPosition || 'center center';
             }
 
-            // Update social media widgets
-            const socialPlatforms = ['youtube', 'steam', 'reddit', 'discord'];
+            // Update social media widgets - Updated to exclude reddit
+            const socialPlatforms = ['youtube', 'steam', 'discord'];
             socialPlatforms.forEach(platform => {
                 const profile = data.settings[`${platform}Profile`] || '';
                 const url = data.settings[`${platform}Url`] || '#';
@@ -1003,42 +967,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         await loadMusicLibrary();
-    }
-
-    async function loadMusicLibrary() {
-        try {
-            const response = await fetch('/api/music');
-            musicLibrary = await response.json();
-            
-            console.log('Music library loaded:', musicLibrary);
-            
-            if (elements.playlist) {
-                elements.playlist.innerHTML = '';
-                
-                if (musicLibrary.length > 0) {
-                    loadSong(musicLibrary[songIndex]);
-                    
-                    musicLibrary.forEach((song, index) => {
-                        const li = document.createElement('li');
-                        li.dataset.songSrc = song.src;
-                        li.innerHTML = `<img src="${song.cover}" alt="cover"> <span>${song.title}</span>`;
-                        li.addEventListener('click', () => {
-                            songIndex = index;
-                            loadSong(musicLibrary[songIndex]);
-                            playSong();
-                        });
-                        elements.playlist.appendChild(li);
-                    });
-                    
-                    showToast(`Loaded ${musicLibrary.length} songs`, 'success');
-                } else {
-                    showToast('No music files found in /assets/music/', 'warning');
-                }
-            }
-        } catch (error) {
-            console.error("Could not load music library", error);
-            showToast('Failed to load music library', 'error');
-        }
     }
 
     const addStoryToList = (story) => {
@@ -1115,11 +1043,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // Theme management
     const themeToggleButton = document.getElementById('theme-toggle');
     function setTheme(theme) {
-        document.body.className = '';
+        document.body.className = document.body.className.replace(/\s*dark-theme\s*/g, '');
         if (theme === 'dark') document.body.classList.add('dark-theme');
         localStorage.setItem('theme', theme);
     }
     setTheme(localStorage.getItem('theme') || 'light');
+
+    // Aspect Toggle management
+    const aspectToggleButton = document.getElementById('aspect-toggle');
+    function toggleAspect() {
+        const currentAspect = localStorage.getItem('aspect') || 'default';
+        let newAspect;
+        
+        if (currentAspect === 'default') {
+            newAspect = 'neuro';
+            showToast('Switched to Neuro Sama colors', 'info');
+        } else if (currentAspect === 'neuro') {
+            newAspect = 'evilNeuro';
+            showToast('Switched to Evil Neuro Sama colors', 'info');
+        } else {
+            newAspect = 'default';
+            showToast('Switched to default colors', 'info');
+        }
+        
+        setAspect(newAspect);
+    }
 
     // Initialize page
     initializePage();
@@ -1192,166 +1140,84 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-        // Social media edit buttons - Fixed implementation
-        document.querySelectorAll('.social-edit-btn').forEach(btn => {
-            btn.onclick = async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
+    // Social media edit buttons - Updated to exclude reddit
+    document.querySelectorAll('.social-edit-btn').forEach(btn => {
+        btn.onclick = async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const social = btn.dataset.social;
+            let promptText = '';
+            let currentValue = '';
+            
+            console.log('Social edit clicked:', social);
+            
+            switch (social) {
+                case 'youtube':
+                    promptText = 'Enter your YouTube channel URL (e.g., https://youtube.com/@username):';
+                    currentValue = elements.youtubeLink?.href || '';
+                    break;
+                case 'steam':
+                    promptText = 'Enter your Steam profile URL (e.g., https://steamcommunity.com/id/username):';
+                    currentValue = document.getElementById('steam-link')?.href || '';
+                    break;
+                case 'discord':
+                    promptText = 'Enter your Discord username (e.g., username#1234):';
+                    currentValue = elements.discordProfile?.textContent || '';
+                    break;
+            }
+            
+            const newValue = prompt(promptText, currentValue);
+            if (!newValue || newValue === currentValue) {
+                return;
+            }
+            
+            showToast(`Updating ${social} profile...`, 'info');
+            
+            try {
+                // First try to fetch profile data from the API
+                const profile = await fetchSocialProfile(social, newValue);
                 
-                const social = btn.dataset.social;
-                let promptText = '';
-                let currentValue = '';
-                
-                console.log('Social edit clicked:', social);
-                
-                switch (social) {
-                    case 'youtube':
-                        promptText = 'Enter your YouTube channel URL (e.g., https://youtube.com/@username):';
-                        currentValue = elements.youtubeLink?.href || '';
-                        break;
-                    case 'steam':
-                        promptText = 'Enter your Steam profile URL (e.g., https://steamcommunity.com/id/username):';
-                        currentValue = document.getElementById('steam-link')?.href || '';
-                        break;
-                    case 'reddit':
-                        promptText = 'Enter your Reddit profile URL (e.g., https://reddit.com/u/username):';
-                        currentValue = document.getElementById('reddit-link')?.href || '';
-                        break;
-                    case 'discord':
-                        promptText = 'Enter your Discord username (e.g., username#1234):';
-                        currentValue = elements.discordProfile?.textContent || '';
-                        break;
-                }
-                
-                const newValue = prompt(promptText, currentValue);
-                if (!newValue || newValue === currentValue) {
-                    return;
-                }
-                
-                showToast(`Updating ${social} profile...`, 'info');
-                
-                try {
-                    // First try to fetch profile data from the API
-                    const profile = await fetchSocialProfile(social, newValue);
+                if (profile) {
+                    // API fetch successful
+                    updateSocialWidget(social, profile);
+                    showToast(`${social} profile updated successfully!`, 'success');
+                } else {
+                    // Fallback to manual update
+                    console.log('API fetch failed, using manual update');
                     
-                    if (profile) {
-                        // API fetch successful
-                        updateSocialWidget(social, profile);
-                        showToast(`${social} profile updated successfully!`, 'success');
-                    } else {
-                        // Fallback to manual update
-                        console.log('API fetch failed, using manual update');
-                        
-                        const updateData = {};
-                        updateData[`${social}Profile`] = newValue;
-                        if (social !== 'discord') {
-                            updateData[`${social}Url`] = newValue;
-                        }
-                        
-                        const settingsResponse = await fetch('/api/settings', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(updateData)
-                        });
-                        
-                        if (!settingsResponse.ok) {
-                            throw new Error('Settings update failed');
-                        }
-                        
-                        // Update UI manually
-                        const profile = {
-                            name: newValue,
-                            url: social !== 'discord' ? newValue : '#',
-                            avatar: `/assets/icons/${social}-icon.png`
-                        };
-                        
-                        updateSocialWidget(social, profile);
-                        showToast(`${social} profile updated`, 'success');
+                    const updateData = {};
+                    updateData[`${social}Profile`] = newValue;
+                    if (social !== 'discord') {
+                        updateData[`${social}Url`] = newValue;
                     }
-                } catch (error) {
-                    console.error('Social media update error:', error);
-                    showToast(`Failed to update ${social} profile`, 'error');
-                }
-            };
-        });
-
-    // Initialize page data with social media loading - Updated
-    async function initializePage() {
-        if (isAdmin) {
-            document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
-        }
-        
-        try {
-            const response = await fetch('/api/data');
-            const data = await response.json();
-
-            // Update UI elements
-            if (elements.username) {
-                elements.username.childNodes[0].nodeValue = data.settings.username + ' ';
-            }
-            if (elements.profilePic) elements.profilePic.src = data.settings.profilePicture;
-            if (data.settings.banner && elements.banner) {
-                elements.banner.style.backgroundImage = `url(${data.settings.banner})`;
-                elements.banner.style.backgroundPosition = data.settings.bannerPosition || 'center center';
-            }
-
-            // Update social media widgets - Fixed
-            const socialPlatforms = ['youtube', 'steam', 'reddit', 'discord'];
-            socialPlatforms.forEach(platform => {
-                const profileName = data.settings[`${platform}Profile`] || `${platform} Profile`;
-                const profileUrl = data.settings[`${platform}Url`] || '#';
-                const profileAvatar = data.settings[`${platform}Avatar`] || `/assets/icons/${platform}-icon.png`;
-                
-                const profile = {
-                    name: profileName,
-                    url: profileUrl,
-                    avatar: profileAvatar
-                };
-                
-                updateSocialWidget(platform, profile);
-            });
-
-            // Load gallery data
-            galleryData.sfw = (data.galleryImages || []).filter(img => img.category === 'sfw' || !img.category);
-            galleryData.nsfw = (data.galleryImages || []).filter(img => img.category === 'nsfw');
-
-            // Load GIF data
-            gifData.sfw = (data.gifs || []).filter(gif => gif.category === 'sfw' || !gif.category);
-            gifData.nsfw = (data.gifs || []).filter(gif => gif.category === 'nsfw');
-
-            // Load homework data by category
-            const categories = ['word', 'pdf', 'autocad', 'solidworks', 'powerpoint'];
-            for (const category of categories) {
-                try {
-                    const response = await fetch(`/api/homework/${category}`);
-                    if (response.ok) {
-                        homeworkData[category] = await response.json();
+                    
+                    const settingsResponse = await fetch('/api/settings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(updateData)
+                    });
+                    
+                    if (!settingsResponse.ok) {
+                        throw new Error('Settings update failed');
                     }
-                } catch (error) {
-                    console.error(`Failed to load ${category} homework:`, error);
+                    
+                    // Update UI manually
+                    const profile = {
+                        name: newValue,
+                        url: social !== 'discord' ? newValue : '#',
+                        avatar: `/assets/icons/${social}-icon.png`
+                    };
+                    
+                    updateSocialWidget(social, profile);
+                    showToast(`${social} profile updated`, 'success');
                 }
+            } catch (error) {
+                console.error('Social media update error:', error);
+                showToast(`Failed to update ${social} profile`, 'error');
             }
-
-            // Load stories (limit to 5 for sidebar)
-            if (elements.storyList) {
-                elements.storyList.innerHTML = '';
-                (data.stories || []).slice(0, 5).forEach(addStoryToList);
-            }
-
-            // Update homework count
-            if (elements.homeworkCount) {
-                const totalHomework = Object.values(homeworkData).reduce((sum, category) => sum + category.length, 0);
-                elements.homeworkCount.textContent = `${totalHomework} projects uploaded`;
-            }
-
-        } catch (error) {
-            console.error("Failed to initialize page data:", error);
-            showToast('Failed to load page data', 'error');
-        }
-
-        // Load music library last to ensure player is ready
-        await loadMusicLibrary();
-    }
+        };
+    });
 
     // Modal close handlers
     document.addEventListener('click', (e) => {
@@ -1452,9 +1318,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-    // Remove duplicate music player event listeners section
-    // (All music player events are now handled above in the main event listeners section)
 
     // Lightbox controls
     const lightboxPrev = document.getElementById('lightbox-prev');
@@ -1571,72 +1434,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             };
         }
-
-        // Social media edit buttons
-        document.querySelectorAll('.social-edit-btn').forEach(btn => {
-            btn.onclick = async () => {
-                const social = btn.dataset.social;
-                let promptText = '';
-                let currentValue = '';
-                
-                switch (social) {
-                    case 'youtube':
-                        promptText = 'Enter your YouTube channel URL:';
-                        currentValue = elements.youtubeLink?.href || '';
-                        break;
-                    case 'steam':
-                        promptText = 'Enter your Steam profile URL:';
-                        currentValue = document.getElementById('steam-link')?.href || '';
-                        break;
-                    case 'reddit':
-                        promptText = 'Enter your Reddit profile URL:';
-                        currentValue = document.getElementById('reddit-link')?.href || '';
-                        break;
-                    case 'discord':
-                        promptText = 'Enter your Discord username (e.g., username#1234):';
-                        currentValue = elements.discordProfile?.textContent || '';
-                        break;
-                }
-                
-                const newValue = prompt(promptText, currentValue);
-                if (newValue && newValue !== currentValue) {
-                    showToast(`Updating ${social} profile...`, 'info');
-                    
-                    // Fetch profile data
-                    const profile = await fetchSocialProfile(social, newValue);
-                    if (profile) {
-                        updateSocialWidget(social, profile);
-                        showToast(`${social} profile updated successfully`, 'success');
-                    } else {
-                        // Fallback to manual update
-                        const updateData = {};
-                        updateData[`${social}Profile`] = newValue;
-                        if (social !== 'discord') {
-                            updateData[`${social}Url`] = newValue;
-                        }
-                        
-                        try {
-                            await fetch('/api/settings', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(updateData)
-                            });
-                            
-                            // Update UI manually
-                            const nameElement = document.getElementById(`${social}-profile`);
-                            const linkElement = document.getElementById(`${social}-link`);
-                            
-                            if (nameElement) nameElement.textContent = newValue;
-                            if (linkElement && social !== 'discord') linkElement.href = newValue;
-                            
-                            showToast(`${social} profile updated`, 'success');
-                        } catch (error) {
-                            showToast(`Failed to update ${social} profile`, 'error');
-                        }
-                    }
-                }
-            };
-        });
     }
 
     // Theme toggle
@@ -1644,6 +1441,11 @@ document.addEventListener('DOMContentLoaded', () => {
         themeToggleButton.addEventListener('click', () => {
             setTheme(document.body.classList.contains('dark-theme') ? 'light' : 'dark');
         });
+    }
+
+    // Aspect toggle
+    if (aspectToggleButton) {
+        aspectToggleButton.addEventListener('click', toggleAspect);
     }
 
     // Profile picture upload

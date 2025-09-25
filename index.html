@@ -197,6 +197,18 @@
                 <div class="clock-time" id="clock-time">12:00 PM</div>
                 <div class="clock-date" id="clock-date">Monday, Jan 1</div>
             </div>
+
+            <div class="customization-controls">
+             <button id="theme-toggle" title="Toggle Theme">Toggle Theme</button>
+             <button id="aspect-toggle" title="Toggle Aspect">Toggle Aspect</button>
+             <div id="background-controls">
+                <div id="background-categories">
+                    <button data-category="sfw" class="active">SFW</button>
+                    <button data-category="nsfw">NSFW</button>
+                </div>
+                <div id="background-switcher"></div>
+             </div>
+        </div>
             
             <button id="change-banner-button" class="admin-only hidden" title="Change Banner">✏️</button>
             <button id="drag-banner-button" class="admin-only hidden" title="Adjust Banner Position">🖱️</button>
@@ -233,17 +245,6 @@
                 <button class="admin-only hidden social-edit-btn" data-social="steam" title="Edit">✏️</button>
             </div>
             
-            <div class="social-widget reddit-widget">
-                <img src="/assets/icons/reddit-icon.png" alt="Reddit" id="reddit-avatar">
-                <div class="social-info">
-                    <h4>Reddit</h4>
-                    <a href="#" id="reddit-link" target="_blank" rel="noopener noreferrer">
-                        <span id="reddit-profile">Reddit Profile</span>
-                    </a>
-                </div>
-                <button class="admin-only hidden social-edit-btn" data-social="reddit" title="Edit">✏️</button>
-            </div>
-            
             <div class="social-widget discord-widget">
                 <img src="/assets/icons/discord-icon.png" alt="Discord" id="discord-avatar">
                 <div class="social-info">
@@ -254,16 +255,7 @@
             </div>
         </div>
         
-        <div class="customization-controls">
-             <button id="theme-toggle" title="Toggle Theme">Toggle Theme</button>
-             <div id="background-controls">
-                <div id="background-categories">
-                    <button data-category="sfw" class="active">SFW</button>
-                    <button data-category="nsfw">NSFW</button>
-                </div>
-                <div id="background-switcher"></div>
-             </div>
-        </div>
+        
     </header>
 
     <main>
